@@ -1439,4 +1439,16 @@ main {
         box-shadow: none;
         border: 1px solid var(--color-black);
     }
+  [data-theme="light"] {
+    --color-background: var(--color-cream-50);
+    --color-surface: var(--color-cream-100);
+    --color-text: var(--color-slate-900);
+}
+
+[data-theme="dark"] {
+    --color-background: var(--color-charcoal-700);
+    --color-surface: var(--color-charcoal-800);
+    --color-text: var(--color-gray-200);
+}
+
 }
