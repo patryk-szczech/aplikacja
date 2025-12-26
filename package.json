@@ -1,51 +1,41 @@
 {
   "name": "Kwitariusz",
   "version": "2.0.0",
-  "description": "System zarządzania opłatami szkolnymi z raportowaniem, finansami i synchronizacją",
+  "description": "System zarzadzania oplatami szkolnymi z raportowaniem, finansami i synchronizacja",
   "main": "main.js",
   "homepage": "./",
   "author": "Studio IGOR",
   "license": "MIT",
   "scripts": {
     "start": "electron .",
-    "dev": "electron . --dev",
-    "build": "electron-builder",
-    "build:win": "electron-builder --win --publish=never",
-    "build:portable": "electron-builder --win --portable"
+    "build": "electron-builder"
   },
   "dependencies": {
-    "better-sqlite3": "^9.2.2",
-    "nodemailer": "^6.9.3",
-    "googleapis": "^118.0.0",
+    "electron-squirrel-startup": "^1.1.0",
+    "better-sqlite3": "^9.6.0",
+    "nodemailer": "^6.9.7",
     "pdfkit": "^0.13.0",
     "exceljs": "^4.3.0",
-    "xlsx": "^0.18.5",
-    "pdf-parse": "^1.1.1",
-    "moment": "^2.29.4",
-    "node-cron": "^3.0.2",
-    "electron-store": "^8.1.0",
-    "dotenv": "^16.3.1"
+    "axios": "^1.6.0",
+    "moment": "^2.29.4"
   },
   "devDependencies": {
-    "electron": "27.0.0",
-    "electron-builder": "24.6.4"
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4"
   },
   "build": {
     "appId": "com.kwitariusz.app",
     "productName": "Kwitariusz Szkoły",
-    "directories": {
-      "buildResources": "assets"
-    },
     "files": [
       "main.js",
       "preload.js",
       "index.html",
       "src/**/*",
-      "public/**/*",
-      "assets/**/*",
-      "node_modules/**/*",
-      "package.json"
+      "public/**/*"
     ],
+    "directories": {
+      "buildResources": "assets"
+    },
     "win": {
       "target": [
         {
@@ -60,20 +50,14 @@
             "x64"
           ]
         }
-      ],
-      "icon": "assets/icon.ico"
+      ]
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Kwitariusz Szkoły",
-      "installerIcon": "assets/icon.png",
-      "uninstallerIcon": "assets/icon.png"
-    },
-    "portable": {
-      "artifactName": "${productName}-portable.exe"
+      "shortcutName": "Kwitariusz Szkoły"
     }
   }
 }
