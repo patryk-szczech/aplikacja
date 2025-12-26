@@ -43,14 +43,16 @@ function initDatabase() {
         kod_pocztowy TEXT
       );
 
-      CREATE TABLE IF NOT EXISTS dzieci (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        rodzic_id INTEGER,
-        grupa_id INTEGER,
-        imie TEXT,
-        nazwisko TEXT,
-        data_urodzenia TEXT
-      );
+    CREATE TABLE IF NOT EXISTS dzieci (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    rodzic_id INTEGER,
+    rodzic_id_2 INTEGER,  // ← DODAJ TĘ LINIĘ
+    grupa_id INTEGER,
+    imie TEXT,
+    nazwisko TEXT,
+    data_urodzenia TEXT
+);
+
 
       CREATE TABLE IF NOT EXISTS stawki (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
