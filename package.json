@@ -25,6 +25,7 @@
   "build": {
     "appId": "com.kwitariusz.app",
     "productName": "Kwitariusz Szkoły",
+    "publish": null,
     "files": [
       "main.js",
       "preload.js",
