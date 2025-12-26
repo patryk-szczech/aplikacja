@@ -1,6 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const isDev = require('electron-is-dev');
 
 let mainWindow;
 
@@ -19,16 +18,7 @@ function createWindow() {
     }
   });
 
-  const startUrl = isDev
-    ? 'http://localhost:3000'
-    : `file://${path.join(__dirname, '../build/index.html')}`;
-
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
-
-  // Otwórz DevTools w dev mode
-  if (isDev) {
-    mainWindow.webContents.openDevTools();
-  }
 
   mainWindow.on('closed', () => {
     mainWindow = null;
@@ -49,15 +39,39 @@ app.on('activate', () => {
   }
 });
 
-// IPC handlers
+// Podstawowe IPC handlers (bez sqlite)
 ipcMain.handle('getPlacowka', async () => {
-  // Placeholder - będzie implementacja z bazą
-  return null;
+  return { id: 1, nazwa: 'Szkoła Testowa', adres: 'ul. Testowa 1' };
 });
 
 ipcMain.handle('getGrupy', async (event, placowkaId) => {
-  // Placeholder
+  return [
+    { id: 1, nazwa: 'Przedszkole', opis: 'Grupy przedszkolne' },
+    { id: 2, nazwa: 'Szkoła', opis: 'Klasy szkolne' }
+  ];
+});
+
+ipcMain.handle('getRodzice', async (event, placowkaId) => {
   return [];
 });
 
-// Więcej handlersów będzie dodawane
+ipcMain.handle('getDzieci', async () => {
+  return [];
+});
+
+ipcMain.handle('getStawki', async () => {
+  return [];
+});
+
+ipcMain.handle('getPlatnosci', async () => {
+  return [];
+});
+
+ipcMain.handle('getStatystyki', async (event, grupaId) => {
+  return {
+    liczba_rodzicow: 0,
+    liczba_dzieci: 0,
+    razem_oplacone: 0,
+    razem_zaleglosci: 0
+  };
+});
