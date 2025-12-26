@@ -11,12 +11,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ============ SETUP EVENT LISTENERS ============
 function setupEventListeners() {
   // Navigation
-  document.querySelectorAll('.nav-item').forEach(item => {
+document.querySelectorAll('.nav-link').forEach(item => {
     item.addEventListener('click', (e) => {
-      const section = e.target.getAttribute('data-section');
-      switchSection(section);
+        e.preventDefault();
+        const section = e.currentTarget.getAttribute('data-section');
+        switchSection(section);
     });
-  });
+});
 
   // Buttons
   document.getElementById('addChildBtn')?.addEventListener('click', showAddChildModal);
