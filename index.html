@@ -815,292 +815,445 @@
 
     <!-- Scripts -->
     <script>
-        // ============ GLOBAL STATE ============
-        let placowkaId = 1;
-        let parents = [];
-        let children = [];
-        let groups = [];
-        let currentSection = 'dashboard';
+      // ============ GLOBAL STATE ============
+let placowkaId = 1;
+let parents = [];
+let children = [];
+let groups = [];
+let placowka = null;
+let currentSection = 'dashboard';
 
-        // ============ THEME TOGGLE ============
-        const themeToggle = document.getElementById('themeToggle');
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-            updateThemeIcon();
+// ============ CHECK IF ELECTRON ============
+const isElectron = typeof window !== 'undefined' && typeof window.ipcRenderer !== 'undefined';
+
+// ============ THEME TOGGLE ============
+const themeToggle = document.getElementById('themeToggle');
+themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+    updateThemeIcon();
+});
+
+function updateThemeIcon() {
+    if (document.body.classList.contains('dark-mode')) {
+        themeToggle.textContent = '☀️';
+    } else {
+        themeToggle.textContent = '🌙';
+    }
+}
+
+// Load saved theme
+if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+}
+updateThemeIcon();
+
+// ============ MODAL FUNCTIONS ============
+function openModal(modalId) {
+    document.getElementById(modalId).classList.add('show');
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('show');
+}
+
+// Close modal on outside click
+document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.remove('show');
+        }
+    });
+});
+
+// ============ NAVIGATION ============
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Remove active from all
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        
+        // Add active to clicked
+        item.classList.add('active');
+        const sectionId = item.getAttribute('data-section');
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.classList.add('active');
+            document.getElementById('page-title').textContent = item.textContent;
+            
+            // Load data for section
+            if (sectionId === 'rodzice') loadParents();
+            if (sectionId === 'dzieci') loadChildren();
+            if (sectionId === 'grupy') loadGroups();
+            if (sectionId === 'placowka') loadPlacowka();
+        }
+    });
+});
+
+// ============ INIT ============
+document.addEventListener('DOMContentLoaded', () => {
+    loadDashboard();
+    setupEventListeners();
+});
+
+// ============ EVENT LISTENERS ============
+function setupEventListeners() {
+    // Dane Placówki
+    document.getElementById('placowkaForm').addEventListener('submit', savePlacowka);
+    
+    // Add buttons
+    document.getElementById('addParentBtn').addEventListener('click', () => {
+        document.getElementById('addParentForm').reset();
+        openModal('addParentModal');
+    });
+
+    document.getElementById('addChildBtn').addEventListener('click', () => {
+        if (parents.length === 0) {
+            alert('⚠️ Najpierw dodaj rodzica!');
+            return;
+        }
+        document.getElementById('addChildForm').reset();
+        populateParentSelect();
+        openModal('addChildModal');
+    });
+
+    // Forms
+    document.getElementById('addParentForm').addEventListener('submit', addParent);
+    document.getElementById('addChildForm').addEventListener('submit', addChild);
+}
+
+// ============ PLACÓWKA ============
+async function loadPlacowka() {
+    try {
+        if (isElectron && window.ipcRenderer) {
+            const data = await window.ipcRenderer.invoke('getPlacowka');
+            if (data) {
+                document.getElementById('placowkaNazwa').value = data.nazwa || '';
+                document.getElementById('placowkaAdres').value = data.adres || '';
+                document.getElementById('placowkaTelefon').value = data.telefon || '';
+                document.getElementById('placowkaEmail').value = data.email || '';
+                placowka = data;
+            }
+        }
+    } catch (error) {
+        console.error('Error loading placowka:', error);
+    }
+}
+
+async function savePlacowka(e) {
+    e.preventDefault();
+    
+    const data = {
+        nazwa: document.getElementById('placowkaNazwa').value,
+        adres: document.getElementById('placowkaAdres').value,
+        telefon: document.getElementById('placowkaTelefon').value,
+        email: document.getElementById('placowkaEmail').value
+    };
+
+    try {
+        if (isElectron && window.ipcRenderer) {
+            await window.ipcRenderer.invoke('addPlacowka', data);
+            alert('✅ Dane placówki zapisane pomyślnie!');
+            placowka = data;
+        } else {
+            alert('✅ Dane placówki zapisane (lokalnie)!');
+            placowka = data;
+        }
+    } catch (error) {
+        console.error('Error saving placowka:', error);
+        alert('❌ Błąd przy zapisywaniu danych placówki!');
+    }
+}
+
+// ============ LOAD DATA ============
+async function loadDashboard() {
+    try {
+        let rodziceCount = parents.length;
+        let dzieciCount = children.length;
+        
+        if (isElectron && window.ipcRenderer) {
+            try {
+                const stats = await window.ipcRenderer.invoke('getStatystyki', 1);
+                rodziceCount = stats.liczba_rodzicow || 0;
+                dzieciCount = stats.liczba_dzieci || 0;
+            } catch (e) {
+                console.log('Stats not available yet');
+            }
+        }
+        
+        document.getElementById('parentsCount').textContent = rodziceCount;
+        document.getElementById('childrenCount').textContent = dzieciCount;
+        document.getElementById('totalPaid').textContent = '0 zł';
+        document.getElementById('totalDebt').textContent = '0 zł';
+    } catch (error) {
+        console.error('Error loading dashboard:', error);
+    }
+}
+
+async function loadParents() {
+    try {
+        if (isElectron && window.ipcRenderer) {
+            const data = await window.ipcRenderer.invoke('getRodzice', 1);
+            parents = data.map(p => ({
+                id: p.id,
+                firstName: p.imie,
+                lastName: p.nazwisko,
+                email: p.email,
+                phone: p.telefon,
+                address: p.adres
+            }));
+        }
+        renderParentsTable();
+    } catch (error) {
+        console.error('Error loading parents:', error);
+    }
+}
+
+async function loadChildren() {
+    try {
+        if (isElectron && window.ipcRenderer) {
+            const data = await window.ipcRenderer.invoke('getDzieci');
+            children = data.map(d => ({
+                id: d.id,
+                firstName: d.imie,
+                lastName: d.nazwisko,
+                parentId: d.rodzic_id,
+                group: d.grupa_id,
+                birthDate: d.data_urodzenia
+            }));
+        }
+        renderChildrenTable();
+    } catch (error) {
+        console.error('Error loading children:', error);
+    }
+}
+
+async function loadGroups() {
+    try {
+        if (isElectron && window.ipcRenderer) {
+            const data = await window.ipcRenderer.invoke('getGrupy', 1);
+            groups = data;
+        }
+        renderGroupsTable();
+    } catch (error) {
+        console.error('Error loading groups:', error);
+    }
+}
+
+// ============ RENDER TABLES ============
+function renderParentsTable() {
+    const tbody = document.getElementById('parentsTable');
+    if (parents.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Brak rodziców</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = parents.map((parent, idx) => `
+        <tr>
+            <td>${parent.firstName}</td>
+            <td>${parent.lastName}</td>
+            <td>${parent.phone || '-'}</td>
+            <td>${parent.email || '-'}</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn-danger btn-sm" onclick="deleteParent(${parent.id || idx})">Usuń</button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderChildrenTable() {
+    const tbody = document.getElementById('childrenTable');
+    if (children.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Brak dzieci</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = children.map((child, idx) => {
+        const parent = parents.find(p => p.id === child.parentId);
+        return `
+            <tr>
+                <td>${child.firstName}</td>
+                <td>${child.lastName}</td>
+                <td>${parent ? parent.firstName + ' ' + parent.lastName : '-'}</td>
+                <td>${child.group || '-'}</td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn-danger btn-sm" onclick="deleteChild(${child.id || idx})">Usuń</button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function renderGroupsTable() {
+    const tbody = document.getElementById('groupsTable');
+    if (groups.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="empty-state">Brak grup</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = groups.map((group, idx) => `
+        <tr>
+            <td>${group.nazwa || group.name}</td>
+            <td>${group.opis || group.description || '-'}</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn-danger btn-sm" onclick="deleteGroup(${group.id})">Usuń</button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// ============ ADD/DELETE FUNCTIONS ============
+async function addParent(e) {
+    e.preventDefault();
+    
+    const data = {
+        placowka_id: 1,
+        imie: document.getElementById('parentFirstName').value,
+        nazwisko: document.getElementById('parentLastName').value,
+        email: document.getElementById('parentEmail').value,
+        telefon: document.getElementById('parentPhone').value,
+        adres: document.getElementById('parentAddress').value,
+        miasto: '',
+        kod_pocztowy: ''
+    };
+
+    try {
+        if (isElectron && window.ipcRenderer) {
+            await window.ipcRenderer.invoke('addRodzic', data);
+        }
+        
+        parents.push({
+            firstName: data.imie,
+            lastName: data.nazwisko,
+            email: data.email,
+            phone: data.telefon,
+            address: data.adres
         });
+        
+        closeModal('addParentModal');
+        await loadParents();
+        updateDashboard();
+        alert('✅ Rodzic dodany pomyślnie!');
+    } catch (error) {
+        console.error('Error adding parent:', error);
+        alert('❌ Błąd przy dodawaniu rodzica!');
+    }
+}
 
-        function updateThemeIcon() {
-            if (document.body.classList.contains('dark-mode')) {
-                themeToggle.textContent = '☀️';
+async function deleteParent(id) {
+    if (confirm('Na pewno chcesz usunąć tego rodzica?')) {
+        try {
+            if (isElectron && window.ipcRenderer && id > 0) {
+                await window.ipcRenderer.invoke('deleteRodzic', id);
             } else {
-                themeToggle.textContent = '🌙';
+                parents = parents.filter((_, idx) => idx !== id);
             }
-        }
-
-        // Load saved theme
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark-mode');
-        }
-        updateThemeIcon();
-
-        // ============ MODAL FUNCTIONS ============
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('show');
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('show');
-        }
-
-        // Close modal on outside click
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.classList.remove('show');
-                }
-            });
-        });
-
-        // ============ NAVIGATION ============
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                
-                // Remove active from all
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-                
-                // Add active to clicked
-                item.classList.add('active');
-                const sectionId = item.getAttribute('data-section');
-                const section = document.getElementById(sectionId);
-                if (section) {
-                    section.classList.add('active');
-                    document.getElementById('page-title').textContent = item.textContent;
-                    
-                    // Load data for section
-                    if (sectionId === 'rodzice') loadParents();
-                    if (sectionId === 'dzieci') loadChildren();
-                    if (sectionId === 'grupy') loadGroups();
-                }
-            });
-        });
-
-        // ============ INIT ============
-        document.addEventListener('DOMContentLoaded', () => {
-            loadDashboard();
-            setupEventListeners();
-        });
-
-        // ============ EVENT LISTENERS ============
-        function setupEventListeners() {
-            // Add buttons
-            document.getElementById('addParentBtn').addEventListener('click', () => {
-                document.getElementById('addParentForm').reset();
-                openModal('addParentModal');
-            });
-
-            document.getElementById('addChildBtn').addEventListener('click', () => {
-                if (parents.length === 0) {
-                    alert('⚠️ Najpierw dodaj rodzica!');
-                    return;
-                }
-                document.getElementById('addChildForm').reset();
-                populateParentSelect();
-                openModal('addChildModal');
-            });
-
-            // Forms
-            document.getElementById('addParentForm').addEventListener('submit', addParent);
-            document.getElementById('addChildForm').addEventListener('submit', addChild);
-        }
-
-        // ============ LOAD DATA ============
-        async function loadDashboard() {
-            try {
-                // Update stats
-                document.getElementById('parentsCount').textContent = parents.length;
-                document.getElementById('childrenCount').textContent = children.length;
-                document.getElementById('totalPaid').textContent = '0 zł';
-                document.getElementById('totalDebt').textContent = '0 zł';
-            } catch (error) {
-                console.error('Error loading dashboard:', error);
-            }
-        }
-
-        async function loadParents() {
-            try {
-                // For now, use in-memory array
-                renderParentsTable();
-            } catch (error) {
-                console.error('Error loading parents:', error);
-            }
-        }
-
-        async function loadChildren() {
-            try {
-                renderChildrenTable();
-            } catch (error) {
-                console.error('Error loading children:', error);
-            }
-        }
-
-        async function loadGroups() {
-            try {
-                renderGroupsTable();
-            } catch (error) {
-                console.error('Error loading groups:', error);
-            }
-        }
-
-        // ============ RENDER TABLES ============
-        function renderParentsTable() {
-            const tbody = document.getElementById('parentsTable');
-            if (parents.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Brak rodziców</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = parents.map((parent, idx) => `
-                <tr>
-                    <td>${parent.firstName}</td>
-                    <td>${parent.lastName}</td>
-                    <td>${parent.phone || '-'}</td>
-                    <td>${parent.email || '-'}</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-danger btn-sm" onclick="deleteParent(${idx})">Usuń</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function renderChildrenTable() {
-            const tbody = document.getElementById('childrenTable');
-            if (children.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Brak dzieci</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = children.map((child, idx) => `
-                <tr>
-                    <td>${child.firstName}</td>
-                    <td>${child.lastName}</td>
-                    <td>${parents[child.parentIdx]?.firstName} ${parents[child.parentIdx]?.lastName}</td>
-                    <td>${child.group || '-'}</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-danger btn-sm" onclick="deleteChild(${idx})">Usuń</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function renderGroupsTable() {
-            const tbody = document.getElementById('groupsTable');
-            if (groups.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" class="empty-state">Brak grup</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = groups.map((group, idx) => `
-                <tr>
-                    <td>${group.name}</td>
-                    <td>${group.description || '-'}</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-danger btn-sm" onclick="deleteGroup(${idx})">Usuń</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        // ============ ADD/DELETE FUNCTIONS ============
-        function addParent(e) {
-            e.preventDefault();
-            
-            const parent = {
-                firstName: document.getElementById('parentFirstName').value,
-                lastName: document.getElementById('parentLastName').value,
-                email: document.getElementById('parentEmail').value,
-                phone: document.getElementById('parentPhone').value,
-                address: document.getElementById('parentAddress').value
-            };
-
-            parents.push(parent);
-            closeModal('addParentModal');
-            renderParentsTable();
+            await loadParents();
             updateDashboard();
-            alert('✅ Rodzic dodany pomyślnie!');
+        } catch (error) {
+            console.error('Error deleting parent:', error);
         }
+    }
+}
 
-        function deleteParent(idx) {
-            if (confirm('Na pewno chcesz usunąć tego rodzica?')) {
-                parents.splice(idx, 1);
-                renderParentsTable();
-                updateDashboard();
-            }
+async function addChild(e) {
+    e.preventDefault();
+    
+    const parentIdx = document.getElementById('childParent').value;
+    
+    if (!parentIdx) {
+        alert('⚠️ Wybierz rodzica!');
+        return;
+    }
+
+    const parent = parents[parentIdx];
+    const parentId = parent.id || parseInt(parentIdx) + 1;
+
+    const data = {
+        rodzic_id: parentId,
+        grupa_id: parseInt(document.getElementById('childGroup').value) || null,
+        imie: document.getElementById('childFirstName').value,
+        nazwisko: document.getElementById('childLastName').value,
+        data_urodzenia: document.getElementById('childBirthDate').value
+    };
+
+    try {
+        if (isElectron && window.ipcRenderer) {
+            await window.ipcRenderer.invoke('addDziecko', data);
         }
+        
+        children.push({
+            firstName: data.imie,
+            lastName: data.nazwisko,
+            parentId: parentId,
+            group: data.grupa_id,
+            birthDate: data.data_urodzenia
+        });
+        
+        closeModal('addChildModal');
+        await loadChildren();
+        updateDashboard();
+        alert('✅ Dziecko dodane pomyślnie!');
+    } catch (error) {
+        console.error('Error adding child:', error);
+        alert('❌ Błąd przy dodawaniu dziecka!');
+    }
+}
 
-        function addChild(e) {
-            e.preventDefault();
-            
-            const parentIdx = document.getElementById('childParent').value;
-            
-            if (!parentIdx) {
-                alert('⚠️ Wybierz rodzica!');
-                return;
+async function deleteChild(id) {
+    if (confirm('Na pewno chcesz usunąć to dziecko?')) {
+        try {
+            if (isElectron && window.ipcRenderer && id > 0) {
+                await window.ipcRenderer.invoke('deleteDziecko', id);
+            } else {
+                children = children.filter((_, idx) => idx !== id);
             }
-
-            const child = {
-                firstName: document.getElementById('childFirstName').value,
-                lastName: document.getElementById('childLastName').value,
-                parentIdx: parseInt(parentIdx),
-                group: document.getElementById('childGroup').value,
-                birthDate: document.getElementById('childBirthDate').value
-            };
-
-            children.push(child);
-            closeModal('addChildModal');
-            renderChildrenTable();
+            await loadChildren();
             updateDashboard();
-            alert('✅ Dziecko dodane pomyślnie!');
+        } catch (error) {
+            console.error('Error deleting child:', error);
         }
+    }
+}
 
-        function deleteChild(idx) {
-            if (confirm('Na pewno chcesz usunąć to dziecko?')) {
-                children.splice(idx, 1);
-                renderChildrenTable();
-                updateDashboard();
+async function deleteGroup(id) {
+    if (confirm('Na pewno chcesz usunąć tę grupę?')) {
+        try {
+            if (isElectron && window.ipcRenderer) {
+                await window.ipcRenderer.invoke('deleteGrupa', id);
+            } else {
+                groups = groups.filter(g => g.id !== id);
             }
+            await loadGroups();
+        } catch (error) {
+            console.error('Error deleting group:', error);
         }
+    }
+}
 
-        function deleteGroup(idx) {
-            if (confirm('Na pewno chcesz usunąć tę grupę?')) {
-                groups.splice(idx, 1);
-                renderGroupsTable();
-            }
-        }
+function populateParentSelect() {
+    const select = document.getElementById('childParent');
+    select.innerHTML = '<option value="">-- Wybierz rodzica --</option>';
+    parents.forEach((parent, idx) => {
+        const option = document.createElement('option');
+        option.value = idx;
+        option.textContent = `${parent.firstName} ${parent.lastName}`;
+        select.appendChild(option);
+    });
+}
 
-        function populateParentSelect() {
-            const select = document.getElementById('childParent');
-            select.innerHTML = '<option value="">-- Wybierz rodzica --</option>';
-            parents.forEach((parent, idx) => {
-                const option = document.createElement('option');
-                option.value = idx;
-                option.textContent = `${parent.firstName} ${parent.lastName}`;
-                select.appendChild(option);
-            });
-        }
-
-        function updateDashboard() {
-            document.getElementById('parentsCount').textContent = parents.length;
-            document.getElementById('childrenCount').textContent = children.length;
-        }
+function updateDashboard() {
+    document.getElementById('parentsCount').textContent = parents.length;
+    document.getElementById('childrenCount').textContent = children.length;
+}
     </script>
 </body>
 </html>
