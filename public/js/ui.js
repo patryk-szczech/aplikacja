@@ -1,606 +1,509 @@
 // ============ GLOBAL STATE ============
-let placowka = null;
-let grupy = [];
-let rodzice = [];
-let dzieci = [];
-let stawki = [];
-let platnosci = [];
+let placowkaId = 1;
+let currentSection = 'dashboard';
 
-// ============ INITIALIZATION ============
-document.addEventListener('DOMContentLoaded', async function() {
-    await loadData();
-    setupEventListeners();
+// ============ INIT ============
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadDashboard();
+  setupEventListeners();
 });
 
-// ============ DATA LOADING ============
-async function loadData() {
-    try {
-        // Pobierz placówkę
-        placowka = await window.api.getPlacowka();
-        if (!placowka) {
-            showModal('placowkaModal');
-        } else {
-            loadPlacowkaData();
-        }
+// ============ SETUP EVENT LISTENERS ============
+function setupEventListeners() {
+  // Navigation
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      const section = e.target.getAttribute('data-section');
+      switchSection(section);
+    });
+  });
 
-        // Pobierz wszystkie dane
-        grupy = await window.api.getGrupy(placowka?.id);
-        rodzice = await window.api.getRodzice(placowka?.id);
-        dzieci = await window.api.getDzieci();
-        stawki = await window.api.getStawki();
-        platnosci = await window.api.getPlatnosci();
+  // Buttons
+  document.getElementById('addChildBtn')?.addEventListener('click', showAddChildModal);
+  document.getElementById('addParentBtn')?.addEventListener('click', showAddParentModal);
+  document.getElementById('addGroupBtn')?.addEventListener('click', showAddGroupModal);
+  document.getElementById('addPaymentBtn')?.addEventListener('click', showAddPaymentModal);
+  document.getElementById('addRateBtn')?.addEventListener('click', showAddRateModal);
 
-        // Załaduj UI
-        loadGrupy();
-        loadRodzice();
-        loadDzieci();
-        loadStawki();
-        loadPlatnosci();
-        loadDashboard();
-        loadSelects();
-    } catch (error) {
-        console.error('Błąd przy ładowaniu danych:', error);
-        showAlert('Błąd przy ładowaniu danych: ' + error.message, 'danger');
-    }
+  // Modal closes
+  document.querySelectorAll('[data-bs-dismiss="modal"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const modal = btn.closest('.modal');
+      if (modal) {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+      }
+    });
+  });
+}
+
+// ============ MODAL HELPERS ============
+function showModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.add('show');
+    modal.style.display = 'block';
+  }
+}
+
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.remove('show');
+    modal.style.display = 'none';
+  }
+}
+
+// ============ SECTION SWITCHING ============
+function switchSection(section) {
+  currentSection = section;
+
+  // Hide all sections
+  document.querySelectorAll('.section').forEach(s => {
+    s.classList.remove('active');
+  });
+
+  // Show selected section
+  const sectionEl = document.getElementById(section);
+  if (sectionEl) {
+    sectionEl.classList.add('active');
+  }
+
+  // Update nav
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  document.querySelector(`[data-section="${section}"]`)?.classList.add('active');
+
+  // Load section data
+  if (section === 'dashboard') {
+    loadDashboard();
+  } else if (section === 'children') {
+    loadChildren();
+  } else if (section === 'parents') {
+    loadParents();
+  } else if (section === 'groups') {
+    loadGroups();
+  } else if (section === 'payments') {
+    loadPayments();
+  } else if (section === 'rates') {
+    loadRates();
+  }
 }
 
 // ============ DASHBOARD ============
-function loadDashboard() {
-    if (!grupy.length) return;
-
-    try {
-        const stats = window.api.getStatystyki(grupy[0]?.id);
-        
-        document.getElementById('statRodzice').textContent = stats.liczba_rodzicow || 0;
-        document.getElementById('statDzieci').textContent = stats.liczba_dzieci || 0;
-        document.getElementById('statOplacone').textContent = ((stats.razem_oplacone || 0) / 100).toFixed(2) + ' zł';
-        document.getElementById('statZaleglosci').textContent = ((stats.razem_zaleglosci || 0) / 100).toFixed(2) + ' zł';
-
-        // Ostatnie płatności
-        const recent = platnosci.slice(0, 5);
-        const tbody = document.getElementById('recentPayments');
-        tbody.innerHTML = '';
-
-        recent.forEach(p => {
-            const rodzic = rodzice.find(r => r.id === p.rodzic_id);
-            const dziecko = dzieci.find(d => d.id === p.dziecko_id);
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${rodzic ? rodzic.imie + ' ' + rodzic.nazwisko : 'Brak'}</td>
-                <td>${dziecko ? dziecko.imie + ' ' + dziecko.nazwisko : 'Brak'}</td>
-                <td>${(p.kwota / 100).toFixed(2)} zł</td>
-                <td>${p.data_platnosci}</td>
-                <td><span class="badge badge-${p.status === 'opłacona' ? 'success' : 'warning'}">${p.status}</span></td>
-            `;
-            tbody.appendChild(row);
-        });
-
-        if (recent.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Brak płatności</td></tr>';
-        }
-    } catch (error) {
-        console.error('Błąd przy ładowaniu dashboard:', error);
-    }
+async function loadDashboard() {
+  try {
+    const stats = await window.api.getStatystyki(placowkaId);
+    
+    document.getElementById('childrenCount').textContent = stats.liczba_dzieci || 0;
+    document.getElementById('parentsCount').textContent = stats.liczba_rodzicow || 0;
+    document.getElementById('totalPaid').textContent = (stats.razem_oplacone || 0) + ' zł';
+    document.getElementById('totalDebt').textContent = (stats.razem_zaleglosci || 0) + ' zł';
+  } catch (error) {
+    console.error('Error loading dashboard:', error);
+  }
 }
 
-// ============ PLACÓWKA ============
-function loadPlacowkaData() {
-    if (placowka) {
-        document.getElementById('placowkaNazwa').value = placowka.nazwa || '';
-        document.getElementById('placowkaAdres').value = placowka.adres || '';
-        document.getElementById('placowkaTelefon').value = placowka.telefon || '';
-        document.getElementById('placowkaEmail').value = placowka.email || '';
-    }
+// ============ CHILDREN ============
+async function loadChildren() {
+  try {
+    const children = await window.api.getDzieci();
+    const tbody = document.querySelector('#childrenTable tbody');
+    
+    if (!tbody) return;
 
-    document.getElementById('placowkaForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        try {
-            const data = {
-                nazwa: document.getElementById('placowkaNazwa').value,
-                adres: document.getElementById('placowkaAdres').value,
-                telefon: document.getElementById('placowkaTelefon').value,
-                email: document.getElementById('placowkaEmail').value
-            };
-
-            if (placowka) {
-                await window.api.updatePlacowka(placowka.id, data);
-            } else {
-                const result = await window.api.addPlacowka(data);
-                placowka = { id: result.lastInsertRowid, ...data };
-            }
-
-            showAlert('Placówka zapisana!', 'success');
-            await loadData();
-        } catch (error) {
-            showAlert('Błąd: ' + error.message, 'danger');
-        }
-    });
-}
-
-// ============ GRUPY ============
-function loadGrupy() {
-    const tbody = document.getElementById('grupiTable');
     tbody.innerHTML = '';
 
-    grupy.forEach(g => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${g.nazwa}</td>
-            <td>${g.opis || '-'}</td>
-            <td>
-                <button class="btn btn-sm btn-outline-primary" onclick="editGrupa(${g.id})">
-                    <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteGrupa(${g.id})">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(row);
+    if (children.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center">Brak dzieci</td></tr>';
+      return;
+    }
+
+    children.forEach(child => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${child.imie}</td>
+        <td>${child.nazwisko}</td>
+        <td>${child.grupa_id || '-'}</td>
+        <td>${child.data_urodzenia || '-'}</td>
+        <td>
+          <button class="btn btn-sm btn-danger" onclick="deleteChild(${child.id})">Usuń</button>
+        </td>
+      `;
+      tbody.appendChild(row);
     });
-
-    if (grupy.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">Brak grup</td></tr>';
-    }
+  } catch (error) {
+    console.error('Error loading children:', error);
+  }
 }
 
-async function saveGrupa() {
-    try {
-        const data = {
-            placowka_id: placowka.id,
-            nazwa: document.getElementById('grupaNazwa').value,
-            opis: document.getElementById('grupaOpis').value
-        };
-
-        await window.api.addGrupa(data);
-        showAlert('Grupa dodana!', 'success');
-        
-        // Wyczyść formularz
-        document.getElementById('grupaForm').reset();
-        
-        // Zamknij modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('grupaModal'));
-        modal.hide();
-        
-        // Przeładuj
-        await loadData();
-    } catch (error) {
-        showAlert('Błąd: ' + error.message, 'danger');
-    }
+function showAddChildModal() {
+  showModal('addChildModal');
 }
 
-async function deleteGrupa(id) {
-    if (confirm('Naprawdę usunąć tę grupę?')) {
-        try {
-            await window.api.deleteGrupa(id);
-            showAlert('Grupa usunięta!', 'success');
-            await loadData();
-        } catch (error) {
-            showAlert('Błąd: ' + error.message, 'danger');
-        }
-    }
+async function submitAddChild() {
+  const rodzicId = document.getElementById('childParentId')?.value;
+  const grupaId = document.getElementById('childGroupId')?.value;
+  const imie = document.getElementById('childFirstName')?.value;
+  const nazwisko = document.getElementById('childLastName')?.value;
+  const dataUrodzenia = document.getElementById('childBirthDate')?.value;
+
+  if (!imie || !nazwisko) {
+    alert('Wypełnij wszystkie pola');
+    return;
+  }
+
+  try {
+    await window.api.addDziecko({
+      rodzic_id: rodzicId || 0,
+      grupa_id: grupaId || 0,
+      imie,
+      nazwisko,
+      data_urodzenia: dataUrodzenia
+    });
+    
+    closeModal('addChildModal');
+    loadChildren();
+    alert('Dziecko dodane!');
+  } catch (error) {
+    console.error('Error adding child:', error);
+    alert('Błąd przy dodawaniu dziecka');
+  }
 }
 
-// ============ RODZICE ============
-function loadRodzice() {
-    const tbody = document.getElementById('rodziceTable');
+async function deleteChild(id) {
+  if (!confirm('Czy na pewno usunąć?')) return;
+  
+  try {
+    await window.api.deleteDziecko(id);
+    loadChildren();
+  } catch (error) {
+    console.error('Error deleting child:', error);
+  }
+}
+
+// ============ PARENTS ============
+async function loadParents() {
+  try {
+    const parents = await window.api.getRodzice(placowkaId);
+    const tbody = document.querySelector('#parentsTable tbody');
+    
+    if (!tbody) return;
+
     tbody.innerHTML = '';
 
-    rodzice.forEach(r => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${r.imie}</td>
-            <td>${r.nazwisko}</td>
-            <td>${r.email || '-'}</td>
-            <td>${r.telefon || '-'}</td>
-            <td>
-                <button class="btn btn-sm btn-outline-primary" onclick="editRodzic(${r.id})">
-                    <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteRodzic(${r.id})">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(row);
+    if (parents.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center">Brak rodziców</td></tr>';
+      return;
+    }
+
+    parents.forEach(parent => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${parent.imie}</td>
+        <td>${parent.nazwisko}</td>
+        <td>${parent.email || '-'}</td>
+        <td>${parent.telefon || '-'}</td>
+        <td>${parent.miasto || '-'}</td>
+        <td>
+          <button class="btn btn-sm btn-danger" onclick="deleteParent(${parent.id})">Usuń</button>
+        </td>
+      `;
+      tbody.appendChild(row);
     });
-
-    if (rodzice.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Brak rodziców</td></tr>';
-    }
+  } catch (error) {
+    console.error('Error loading parents:', error);
+  }
 }
 
-async function saveRodzic() {
-    try {
-        const data = {
-            placowka_id: placowka.id,
-            imie: document.getElementById('rodzicImie').value,
-            nazwisko: document.getElementById('rodzicNazwisko').value,
-            email: document.getElementById('rodzicEmail').value,
-            telefon: document.getElementById('rodzicTelefon').value,
-            adres: document.getElementById('rodzicAdres').value,
-            miasto: document.getElementById('rodzicMiasto').value,
-            kod_pocztowy: document.getElementById('rodzicKodPocztowy').value
-        };
-
-        await window.api.addRodzic(data);
-        showAlert('Rodzic dodany!', 'success');
-        document.getElementById('rodzicForm').reset();
-        
-        const modal = bootstrap.Modal.getInstance(document.getElementById('rodzicModal'));
-        modal.hide();
-        
-        await loadData();
-    } catch (error) {
-        showAlert('Błąd: ' + error.message, 'danger');
-    }
+function showAddParentModal() {
+  showModal('addParentModal');
 }
 
-async function deleteRodzic(id) {
-    if (confirm('Naprawdę usunąć tego rodzica?')) {
-        try {
-            await window.api.deleteRodzic(id);
-            showAlert('Rodzic usunięty!', 'success');
-            await loadData();
-        } catch (error) {
-            showAlert('Błąd: ' + error.message, 'danger');
-        }
-    }
+async function submitAddParent() {
+  const imie = document.getElementById('parentFirstName')?.value;
+  const nazwisko = document.getElementById('parentLastName')?.value;
+  const email = document.getElementById('parentEmail')?.value;
+  const telefon = document.getElementById('parentPhone')?.value;
+  const adres = document.getElementById('parentAddress')?.value;
+  const miasto = document.getElementById('parentCity')?.value;
+  const kodPocztowy = document.getElementById('parentPostCode')?.value;
+
+  if (!imie || !nazwisko) {
+    alert('Wypełnij imię i nazwisko');
+    return;
+  }
+
+  try {
+    await window.api.addRodzic({
+      placowka_id: placowkaId,
+      imie,
+      nazwisko,
+      email,
+      telefon,
+      adres,
+      miasto,
+      kod_pocztowy: kodPocztowy
+    });
+    
+    closeModal('addParentModal');
+    loadParents();
+    alert('Rodzic dodany!');
+  } catch (error) {
+    console.error('Error adding parent:', error);
+    alert('Błąd przy dodawaniu rodzica');
+  }
 }
 
-// ============ DZIECI ============
-function loadDzieci() {
-    const tbody = document.getElementById('dzieciTable');
+async function deleteParent(id) {
+  if (!confirm('Czy na pewno usunąć?')) return;
+  
+  try {
+    await window.api.deleteRodzic(id);
+    loadParents();
+  } catch (error) {
+    console.error('Error deleting parent:', error);
+  }
+}
+
+// ============ GROUPS ============
+async function loadGroups() {
+  try {
+    const groups = await window.api.getGrupy(placowkaId);
+    const tbody = document.querySelector('#groupsTable tbody');
+    
+    if (!tbody) return;
+
     tbody.innerHTML = '';
 
-    dzieci.forEach(d => {
-        const rodzic = rodzice.find(r => r.id === d.rodzic_id);
-        const grupa = grupy.find(g => g.id === d.grupa_id);
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${d.imie}</td>
-            <td>${d.nazwisko}</td>
-            <td>${rodzic ? rodzic.imie + ' ' + rodzic.nazwisko : 'Brak'}</td>
-            <td>${grupa ? grupa.nazwa : 'Brak'}</td>
-            <td>
-                <button class="btn btn-sm btn-outline-primary" onclick="editDziecko(${d.id})">
-                    <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteDziecko(${d.id})">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(row);
+    if (groups.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="text-center">Brak grup</td></tr>';
+      return;
+    }
+
+    groups.forEach(group => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${group.nazwa}</td>
+        <td>${group.opis || '-'}</td>
+        <td>
+          <button class="btn btn-sm btn-danger" onclick="deleteGroup(${group.id})">Usuń</button>
+        </td>
+      `;
+      tbody.appendChild(row);
     });
-
-    if (dzieci.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Brak dzieci</td></tr>';
-    }
+  } catch (error) {
+    console.error('Error loading groups:', error);
+  }
 }
 
-async function saveDziecko() {
-    try {
-        const data = {
-            grupa_id: parseInt(document.getElementById('dzieckoGrupa').value),
-            rodzic_id: parseInt(document.getElementById('dzieckoRodzic').value),
-            imie: document.getElementById('dzieckoImie').value,
-            nazwisko: document.getElementById('dzieckoNazwisko').value,
-            data_urodzenia: document.getElementById('dzieckoDataUrodzenia').value
-        };
-
-        await window.api.addDziecko(data);
-        showAlert('Dziecko dodane!', 'success');
-        document.getElementById('dzieckoForm').reset();
-        
-        const modal = bootstrap.Modal.getInstance(document.getElementById('dzieckoModal'));
-        modal.hide();
-        
-        await loadData();
-    } catch (error) {
-        showAlert('Błąd: ' + error.message, 'danger');
-    }
+function showAddGroupModal() {
+  showModal('addGroupModal');
 }
 
-async function deleteDziecko(id) {
-    if (confirm('Naprawdę usunąć to dziecko?')) {
-        try {
-            await window.api.deleteDziecko(id);
-            showAlert('Dziecko usunięte!', 'success');
-            await loadData();
-        } catch (error) {
-            showAlert('Błąd: ' + error.message, 'danger');
-        }
-    }
+async function submitAddGroup() {
+  const nazwa = document.getElementById('groupName')?.value;
+  const opis = document.getElementById('groupDescription')?.value;
+
+  if (!nazwa) {
+    alert('Wypełnij nazwę grupy');
+    return;
+  }
+
+  try {
+    await window.api.addGrupa({
+      placowka_id: placowkaId,
+      nazwa,
+      opis
+    });
+    
+    closeModal('addGroupModal');
+    loadGroups();
+    alert('Grupa dodana!');
+  } catch (error) {
+    console.error('Error adding group:', error);
+    alert('Błąd przy dodawaniu grupy');
+  }
 }
 
-// ============ STAWKI ============
-function loadStawki() {
-    const tbody = document.getElementById('stawkiTable');
+async function deleteGroup(id) {
+  if (!confirm('Czy na pewno usunąć?')) return;
+  
+  try {
+    await window.api.deleteGrupa(id);
+    loadGroups();
+  } catch (error) {
+    console.error('Error deleting group:', error);
+  }
+}
+
+// ============ PAYMENTS ============
+async function loadPayments() {
+  try {
+    const payments = await window.api.getPlatnosci();
+    const tbody = document.querySelector('#paymentsTable tbody');
+    
+    if (!tbody) return;
+
     tbody.innerHTML = '';
 
-    stawki.forEach(s => {
-        const grupa = grupy.find(g => g.id === s.grupa_id);
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${grupa ? grupa.nazwa : 'Brak'}</td>
-            <td>${s.kategoria}</td>
-            <td>${(s.kwota / 100).toFixed(2)} zł</td>
-            <td>${s.data_od || '-'}</td>
-            <td>${s.data_do || '-'}</td>
-            <td>
-                <button class="btn btn-sm btn-outline-primary" onclick="editStawka(${s.id})">
-                    <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="deleteStawka(${s.id})">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(row);
+    if (payments.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center">Brak płatności</td></tr>';
+      return;
+    }
+
+    payments.forEach(payment => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${payment.data_platnosci || '-'}</td>
+        <td>${payment.rodzic_id || '-'}</td>
+        <td>${payment.kwota} zł</td>
+        <td>${payment.kategoria || '-'}</td>
+        <td><span class="badge ${payment.status === 'opłacona' ? 'badge-success' : 'badge-danger'}">${payment.status || '-'}</span></td>
+        <td>
+          <button class="btn btn-sm btn-danger" onclick="deletePayment(${payment.id})">Usuń</button>
+        </td>
+      `;
+      tbody.appendChild(row);
     });
-
-    if (stawki.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Brak stawek</td></tr>';
-    }
+  } catch (error) {
+    console.error('Error loading payments:', error);
+  }
 }
 
-async function saveStawka() {
-    try {
-        const data = {
-            grupa_id: parseInt(document.getElementById('stawkaGrupa').value),
-            kategoria: document.getElementById('stawkaKategoria').value,
-            kwota: parseFloat(document.getElementById('stawkaKwota').value) * 100,
-            data_od: document.getElementById('stawkaDataOd').value,
-            data_do: document.getElementById('stawkaDataDo').value
-        };
-
-        await window.api.addStawka(data);
-        showAlert('Stawka dodana!', 'success');
-        document.getElementById('stawkaForm').reset();
-        
-        const modal = bootstrap.Modal.getInstance(document.getElementById('stawkaModal'));
-        modal.hide();
-        
-        await loadData();
-    } catch (error) {
-        showAlert('Błąd: ' + error.message, 'danger');
-    }
+function showAddPaymentModal() {
+  showModal('addPaymentModal');
 }
 
-async function deleteStawka(id) {
-    if (confirm('Naprawdę usunąć tę stawkę?')) {
-        try {
-            await window.api.deleteStawka(id);
-            showAlert('Stawka usunięta!', 'success');
-            await loadData();
-        } catch (error) {
-            showAlert('Błąd: ' + error.message, 'danger');
-        }
-    }
+async function submitAddPayment() {
+  const rodzicId = document.getElementById('paymentParentId')?.value;
+  const kwota = document.getElementById('paymentAmount')?.value;
+  const dataPlatnosci = document.getElementById('paymentDate')?.value;
+  const kategoria = document.getElementById('paymentCategory')?.value;
+  const status = document.getElementById('paymentStatus')?.value;
+
+  if (!rodzicId || !kwota) {
+    alert('Wypełnij rodzica i kwotę');
+    return;
+  }
+
+  try {
+    await window.api.addPlatnosc({
+      rodzic_id: rodzicId,
+      dziecko_id: null,
+      kwota: parseInt(kwota),
+      data_platnosci: dataPlatnosci,
+      kategoria,
+      opis: '',
+      status
+    });
+    
+    closeModal('addPaymentModal');
+    loadPayments();
+    alert('Płatność dodana!');
+  } catch (error) {
+    console.error('Error adding payment:', error);
+    alert('Błąd przy dodawaniu płatności');
+  }
 }
 
-// ============ PŁATNOŚCI ============
-function loadPlatnosci() {
-    const tbody = document.getElementById('platnosciTable');
+async function deletePayment(id) {
+  if (!confirm('Czy na pewno usunąć?')) return;
+  
+  try {
+    await window.api.deletePlatnosc(id);
+    loadPayments();
+  } catch (error) {
+    console.error('Error deleting payment:', error);
+  }
+}
+
+// ============ RATES ============
+async function loadRates() {
+  try {
+    const rates = await window.api.getStawki();
+    const tbody = document.querySelector('#ratesTable tbody');
+    
+    if (!tbody) return;
+
     tbody.innerHTML = '';
 
-    platnosci.forEach(p => {
-        const rodzic = rodzice.find(r => r.id === p.rodzic_id);
-        const dziecko = dzieci.find(d => d.id === p.dziecko_id);
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${rodzic ? rodzic.imie + ' ' + rodzic.nazwisko : 'Brak'}</td>
-            <td>${dziecko ? dziecko.imie + ' ' + dziecko.nazwisko : 'Brak'}</td>
-            <td>${(p.kwota / 100).toFixed(2)} zł</td>
-            <td>${p.data_platnosci}</td>
-            <td><span class="badge badge-${p.status === 'opłacona' ? 'success' : 'warning'}">${p.status}</span></td>
-            <td>
-                <button class="btn btn-sm btn-outline-danger" onclick="deletePlatnosc(${p.id})">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(row);
+    if (rates.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center">Brak stawek</td></tr>';
+      return;
+    }
+
+    rates.forEach(rate => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${rate.kategoria}</td>
+        <td>${rate.kwota} zł</td>
+        <td>${rate.data_od || '-'}</td>
+        <td>${rate.data_do || '-'}</td>
+        <td>
+          <button class="btn btn-sm btn-danger" onclick="deleteRate(${rate.id})">Usuń</button>
+        </td>
+      `;
+      tbody.appendChild(row);
     });
-
-    if (platnosci.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Brak płatności</td></tr>';
-    }
+  } catch (error) {
+    console.error('Error loading rates:', error);
+  }
 }
 
-async function savePlatnosc() {
-    try {
-        const data = {
-            rodzic_id: parseInt(document.getElementById('platnoscRodzic').value),
-            dziecko_id: parseInt(document.getElementById('platnoscDziecko').value) || null,
-            kwota: parseFloat(document.getElementById('platnoscKwota').value) * 100,
-            data_platnosci: document.getElementById('platnoscData').value,
-            kategoria: document.getElementById('platnoscKategoria').value,
-            opis: document.getElementById('platnoscOpis').value,
-            status: document.getElementById('platnoscStatus').value
-        };
-
-        await window.api.addPlatnosc(data);
-        showAlert('Płatność dodana!', 'success');
-        document.getElementById('platnoscForm').reset();
-        
-        const modal = bootstrap.Modal.getInstance(document.getElementById('platnoscModal'));
-        modal.hide();
-        
-        await loadData();
-    } catch (error) {
-        showAlert('Błąd: ' + error.message, 'danger');
-    }
+function showAddRateModal() {
+  showModal('addRateModal');
 }
 
-async function deletePlatnosc(id) {
-    if (confirm('Naprawdę usunąć tę płatność?')) {
-        try {
-            await window.api.deletePlatnosc(id);
-            showAlert('Płatność usunięta!', 'success');
-            await loadData();
-        } catch (error) {
-            showAlert('Błąd: ' + error.message, 'danger');
-        }
-    }
+async function submitAddRate() {
+  const grupaId = document.getElementById('rateGroupId')?.value;
+  const kategoria = document.getElementById('rateCategory')?.value;
+  const kwota = document.getElementById('rateAmount')?.value;
+  const dataOd = document.getElementById('rateFrom')?.value;
+  const dataDo = document.getElementById('rateTo')?.value;
+
+  if (!kategoria || !kwota) {
+    alert('Wypełnij kategorię i kwotę');
+    return;
+  }
+
+  try {
+    await window.api.addStawka({
+      grupa_id: grupaId || 0,
+      kategoria,
+      kwota: parseInt(kwota),
+      data_od: dataOd,
+      data_do: dataDo
+    });
+    
+    closeModal('addRateModal');
+    loadRates();
+    alert('Stawka dodana!');
+  } catch (error) {
+    console.error('Error adding rate:', error);
+    alert('Błąd przy dodawaniu stawki');
+  }
 }
 
-// ============ RAPORTY ============
-async function generateReport(type, format = 'pdf') {
-    try {
-        showAlert('Generowanie raportu...', 'info');
-        
-        if (format === 'pdf') {
-            await window.api.generatePdfReport(type, {});
-        } else {
-            await window.api.generateExcelReport(type, {});
-        }
-        
-        showAlert('Raport został wygenerowany i pobrany!', 'success');
-    } catch (error) {
-        showAlert('Błąd: ' + error.message, 'danger');
-    }
-}
-
-async function generateInvoice() {
-    const rodzicId = document.getElementById('rodzicForInvoice').value;
-    if (!rodzicId) {
-        showAlert('Wybierz rodzica!', 'warning');
-        return;
-    }
-
-    try {
-        showAlert('Generowanie rachunku...', 'info');
-        const today = new Date().toLocaleDateString('pl-PL');
-        await window.api.generateInvoice(rodzicId, today);
-        showAlert('Rachunek został wygenerowany!', 'success');
-    } catch (error) {
-        showAlert('Błąd: ' + error.message, 'danger');
-    }
-}
-
-// ============ IMPORT ============
-async function importBankData() {
-    const file = document.getElementById('importFile').files[0];
-    if (!file) {
-        showAlert('Wybierz plik!', 'warning');
-        return;
-    }
-
-    try {
-        const filePath = await window.api.selectImportFile();
-        if (!filePath) return;
-
-        showAlert('Importowanie...', 'info');
-
-        let result;
-        if (file.name.endsWith('.csv')) {
-            result = await window.api.importCSV(filePath);
-        } else {
-            result = await window.api.importXLSX(filePath);
-        }
-
-        if (result.success) {
-            showAlert(`Import zakończony! Zaimportowano: ${result.imported}`, 'success');
-            await loadData();
-        } else {
-            showAlert('Błąd: ' + result.message, 'danger');
-        }
-    } catch (error) {
-        showAlert('Błąd: ' + error.message, 'danger');
-    }
+async function deleteRate(id) {
+  if (!confirm('Czy na pewno usunąć?')) return;
+  
+  try {
+    await window.api.deleteStawka(id);
+    loadRates();
+  } catch (error) {
+    console.error('Error deleting rate:', error);
+  }
 }
 
 // ============ BACKUP ============
-async function createBackup() {
-    try {
-        showAlert('Tworzenie backupu...', 'info');
-        const result = await window.api.backupData();
-        if (result.success) {
-            showAlert('Backup został utworzony!', 'success');
-            loadBackups();
-        } else {
-            showAlert('Błąd: ' + result.message, 'danger');
-        }
-    } catch (error) {
-        showAlert('Błąd: ' + error.message, 'danger');
-    }
-}
-
-async function restoreBackup() {
-    try {
-        const result = await window.api.restoreData();
-        if (result.success) {
-            showAlert('Dane zostały przywrócone! Aplikacja będzie przeładowana...', 'success');
-            setTimeout(() => location.reload(), 2000);
-        } else {
-            showAlert('Błąd: ' + result.message, 'danger');
-        }
-    } catch (error) {
-        showAlert('Błąd: ' + error.message, 'danger');
-    }
-}
-
-function loadBackups() {
-    // Funkcja do załadowania listy backupów
-    // Będzie zaimplementowana razem z pełnym UI
-}
-
-// ============ UTILITIES ============
-function showSection(sectionId) {
-    // Ukryj wszystkie sekcje
-    document.querySelectorAll('.content-section').forEach(section => {
-        section.classList.remove('active');
-    });
-
-    // Pokazuj wybraną sekcję
-    document.getElementById(sectionId).classList.add('active');
-
-    // Aktualizuj aktywny link w sidebar
-    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-        link.classList.remove('active');
-    });
-    event.target.closest('.nav-link').classList.add('active');
-}
-
-function showAlert(message, type = 'info') {
-    // Prosta implementacja alertu
-    alert(message);
-}
-
-function loadSelects() {
-    // Załaduj selecty w modalsach
-    const rodzicSelects = document.querySelectorAll('[id*="Rodzic"]');
-    const grupaSelects = document.querySelectorAll('[id*="Grupa"]');
-
-    rodzicSelects.forEach(select => {
-        select.innerHTML = '<option value="">-- Wybierz --</option>';
-        rodzice.forEach(r => {
-            const option = document.createElement('option');
-            option.value = r.id;
-            option.textContent = `${r.imie} ${r.nazwisko}`;
-            select.appendChild(option);
-        });
-    });
-
-    grupaSelects.forEach(select => {
-        select.innerHTML = '<option value="">-- Wybierz --</option>';
-        grupy.forEach(g => {
-            const option = document.createElement('option');
-            option.value = g.id;
-            option.textContent = g.nazwa;
-            select.appendChild(option);
-        });
-    });
-}
-
-function setupEventListeners() {
-    // Dodaj inne event listenery tutaj
-}
-
-// Bootstrap Modal Helper
-function showModal(modalId) {
-    const modal = new bootstrap.Modal(document.getElementById(modalId));
-    modal.show();
+async function backupData() {
+  try {
+    await window.api.backupData();
+    alert('Backup zapisany!');
+  } catch (error) {
+    console.error('Error backing up data:', error);
+    alert('Błąd przy tworzeniu backupu');
+  }
 }
