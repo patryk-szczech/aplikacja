@@ -499,7 +499,7 @@
                     <div class="icon">⚠️</div>
                 </div>
             </div>
-
+            
             <div class="table-container">
                 <h3>Ostatnie Płatności</h3>
                 <table>
@@ -549,9 +549,9 @@
 
         <!-- GRUPY SECTION -->
         <section id="grupy" class="section">
-            <button class="btn-primary" id="addGroupBtn">+ Dodaj Grupę</button>
+            <button class="btn-primary" id="addGroupBtn">+ Dodaj Grupę/Klasę</button>
             <div class="table-container" style="margin-top: 20px;">
-                <h3>Grupy</h3>
+                <h3>Grupy/Klasy</h3>
                 <table>
                     <thead>
                         <tr>
@@ -603,8 +603,8 @@
                         <tr>
                             <th>Imię</th>
                             <th>Nazwisko</th>
-                            <th>Rodzic</th>
-                            <th>Grupa</th>
+                            <th>Klasa</th>
+                            <th>Rodzice</th>
                             <th>Akcje</th>
                         </tr>
                     </thead>
@@ -754,16 +754,12 @@
                     <input type="text" id="parentLastName" required>
                 </div>
                 <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="parentEmail">
-                </div>
-                <div class="form-group">
                     <label>Telefon</label>
-                    <input type="tel" id="parentPhone">
+                    <input type="tel" id="parentPhone" placeholder="np. 123456789">
                 </div>
                 <div class="form-group">
-                    <label>Adres</label>
-                    <input type="text" id="parentAddress">
+                    <label>Email</label>
+                    <input type="email" id="parentEmail" placeholder="np. rodzic@email.com">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary" onclick="closeModal('addParentModal')">Anuluj</button>
@@ -782,12 +778,6 @@
             </div>
             <form id="addChildForm">
                 <div class="form-group">
-                    <label>Rodzic *</label>
-                    <select id="childParent" required>
-                        <option value="">-- Wybierz rodzica --</option>
-                    </select>
-                </div>
-                <div class="form-group">
                     <label>Imię *</label>
                     <input type="text" id="childFirstName" required>
                 </div>
@@ -796,14 +786,22 @@
                     <input type="text" id="childLastName" required>
                 </div>
                 <div class="form-group">
-                    <label>Grupa</label>
-                    <select id="childGroup">
-                        <option value="">-- Wybierz grupę --</option>
+                    <label>Klasa *</label>
+                    <select id="childGroup" required>
+                        <option value="">-- Wybierz klasę --</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Data urodzenia</label>
-                    <input type="date" id="childBirthDate">
+                    <label>Główny rodzic *</label>
+                    <select id="childParent1" required>
+                        <option value="">-- Wybierz głównego rodzica --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Drugi rodzic (opcjonalnie)</label>
+                    <select id="childParent2">
+                        <option value="">-- Bez drugiego rodzica --</option>
+                    </select>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary" onclick="closeModal('addChildModal')">Anuluj</button>
@@ -813,9 +811,33 @@
         </div>
     </div>
 
+    <!-- MODAL: Dodaj Grupę -->
+    <div id="addGroupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Dodaj Grupę/Klasę</h2>
+                <button class="close-btn" onclick="closeModal('addGroupModal')">✕</button>
+            </div>
+            <form id="addGroupForm">
+                <div class="form-group">
+                    <label>Nazwa Grupy/Klasy *</label>
+                    <input type="text" id="groupName" placeholder="np. Klasa 1a" required>
+                </div>
+                <div class="form-group">
+                    <label>Opis</label>
+                    <input type="text" id="groupDescription" placeholder="np. Grupy przedszkolne">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('addGroupModal')">Anuluj</button>
+                    <button type="submit" class="btn-primary">Dodaj</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script>
-      // ============ GLOBAL STATE ============
+// ============ GLOBAL STATE ============
 let placowkaId = 1;
 let parents = [];
 let children = [];
@@ -896,6 +918,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
 document.addEventListener('DOMContentLoaded', () => {
     loadDashboard();
     setupEventListeners();
+    loadGroups();
 });
 
 // ============ EVENT LISTENERS ============
@@ -915,13 +938,19 @@ function setupEventListeners() {
             return;
         }
         document.getElementById('addChildForm').reset();
-        populateParentSelect();
+        populateParentSelects();
         openModal('addChildModal');
+    });
+
+    document.getElementById('addGroupBtn').addEventListener('click', () => {
+        document.getElementById('addGroupForm').reset();
+        openModal('addGroupModal');
     });
 
     // Forms
     document.getElementById('addParentForm').addEventListener('submit', addParent);
     document.getElementById('addChildForm').addEventListener('submit', addChild);
+    document.getElementById('addGroupForm').addEventListener('submit', addGroup);
 }
 
 // ============ PLACÓWKA ============
@@ -1008,6 +1037,7 @@ async function loadParents() {
         renderParentsTable();
     } catch (error) {
         console.error('Error loading parents:', error);
+        renderParentsTable();
     }
 }
 
@@ -1020,6 +1050,7 @@ async function loadChildren() {
                 firstName: d.imie,
                 lastName: d.nazwisko,
                 parentId: d.rodzic_id,
+                parent2Id: d.rodzic_id_2 || null,
                 group: d.grupa_id,
                 birthDate: d.data_urodzenia
             }));
@@ -1027,6 +1058,7 @@ async function loadChildren() {
         renderChildrenTable();
     } catch (error) {
         console.error('Error loading children:', error);
+        renderChildrenTable();
     }
 }
 
@@ -1037,8 +1069,11 @@ async function loadGroups() {
             groups = data;
         }
         renderGroupsTable();
+        populateGroupSelect();
     } catch (error) {
         console.error('Error loading groups:', error);
+        renderGroupsTable();
+        populateGroupSelect();
     }
 }
 
@@ -1073,13 +1108,24 @@ function renderChildrenTable() {
     }
 
     tbody.innerHTML = children.map((child, idx) => {
-        const parent = parents.find(p => p.id === child.parentId);
+        const parent1 = parents.find(p => p.id === child.parentId);
+        const parent2 = child.parent2Id ? parents.find(p => p.id === child.parent2Id) : null;
+        
+        let parentText = parent1 ? `${parent1.firstName} ${parent1.lastName}` : '-';
+        if (parent2) {
+            parentText += `, ${parent2.firstName} ${parent2.lastName}`;
+        }
+        
+        // Find group name
+        const groupObj = groups.find(g => g.id === child.group);
+        const groupName = groupObj ? groupObj.nazwa || groupObj.name : '-';
+        
         return `
             <tr>
                 <td>${child.firstName}</td>
                 <td>${child.lastName}</td>
-                <td>${parent ? parent.firstName + ' ' + parent.lastName : '-'}</td>
-                <td>${child.group || '-'}</td>
+                <td>${groupName}</td>
+                <td>${parentText}</td>
                 <td>
                     <div class="action-buttons">
                         <button class="btn-danger btn-sm" onclick="deleteChild(${child.id || idx})">Usuń</button>
@@ -1120,7 +1166,7 @@ async function addParent(e) {
         nazwisko: document.getElementById('parentLastName').value,
         email: document.getElementById('parentEmail').value,
         telefon: document.getElementById('parentPhone').value,
-        adres: document.getElementById('parentAddress').value,
+        adres: '',
         miasto: '',
         kod_pocztowy: ''
     };
@@ -1167,22 +1213,32 @@ async function deleteParent(id) {
 async function addChild(e) {
     e.preventDefault();
     
-    const parentIdx = document.getElementById('childParent').value;
+    const parentIdx = document.getElementById('childParent1').value;
+    const parent2Idx = document.getElementById('childParent2').value;
     
     if (!parentIdx) {
-        alert('⚠️ Wybierz rodzica!');
+        alert('⚠️ Wybierz głównego rodzica!');
         return;
     }
 
-    const parent = parents[parentIdx];
-    const parentId = parent.id || parseInt(parentIdx) + 1;
+    const parent1 = parents[parentIdx];
+    const parent1Id = parent1.id || parseInt(parentIdx) + 1;
+    
+    let parent2Id = null;
+    if (parent2Idx) {
+        const parent2 = parents[parent2Idx];
+        parent2Id = parent2.id || parseInt(parent2Idx) + 1;
+    }
+
+    const groupValue = document.getElementById('childGroup').value;
 
     const data = {
-        rodzic_id: parentId,
-        grupa_id: parseInt(document.getElementById('childGroup').value) || null,
+        rodzic_id: parent1Id,
+        rodzic_id_2: parent2Id,
+        grupa_id: groupValue ? parseInt(groupValue) : null,
         imie: document.getElementById('childFirstName').value,
         nazwisko: document.getElementById('childLastName').value,
-        data_urodzenia: document.getElementById('childBirthDate').value
+        data_urodzenia: ''
     };
 
     try {
@@ -1193,9 +1249,10 @@ async function addChild(e) {
         children.push({
             firstName: data.imie,
             lastName: data.nazwisko,
-            parentId: parentId,
+            parentId: parent1Id,
+            parent2Id: parent2Id,
             group: data.grupa_id,
-            birthDate: data.data_urodzenia
+            birthDate: ''
         });
         
         closeModal('addChildModal');
@@ -1224,6 +1281,34 @@ async function deleteChild(id) {
     }
 }
 
+async function addGroup(e) {
+    e.preventDefault();
+    
+    const data = {
+        placowka_id: 1,
+        nazwa: document.getElementById('groupName').value,
+        opis: document.getElementById('groupDescription').value
+    };
+
+    try {
+        if (isElectron && window.ipcRenderer) {
+            const result = await window.ipcRenderer.invoke('addGrupa', data);
+            data.id = result.lastInsertRowid;
+        } else {
+            data.id = groups.length + 1;
+        }
+        
+        groups.push(data);
+        
+        closeModal('addGroupModal');
+        await loadGroups();
+        alert('✅ Grupa dodana pomyślnie!');
+    } catch (error) {
+        console.error('Error adding group:', error);
+        alert('❌ Błąd przy dodawaniu grupy!');
+    }
+}
+
 async function deleteGroup(id) {
     if (confirm('Na pewno chcesz usunąć tę grupę?')) {
         try {
@@ -1239,13 +1324,34 @@ async function deleteGroup(id) {
     }
 }
 
-function populateParentSelect() {
-    const select = document.getElementById('childParent');
-    select.innerHTML = '<option value="">-- Wybierz rodzica --</option>';
+function populateParentSelects() {
+    const select1 = document.getElementById('childParent1');
+    const select2 = document.getElementById('childParent2');
+    
+    select1.innerHTML = '<option value="">-- Wybierz głównego rodzica --</option>';
+    select2.innerHTML = '<option value="">-- Bez drugiego rodzica --</option>';
+    
     parents.forEach((parent, idx) => {
+        const option1 = document.createElement('option');
+        option1.value = idx;
+        option1.textContent = `${parent.firstName} ${parent.lastName}`;
+        select1.appendChild(option1);
+        
+        const option2 = document.createElement('option');
+        option2.value = idx;
+        option2.textContent = `${parent.firstName} ${parent.lastName}`;
+        select2.appendChild(option2);
+    });
+}
+
+function populateGroupSelect() {
+    const select = document.getElementById('childGroup');
+    select.innerHTML = '<option value="">-- Wybierz klasę --</option>';
+    
+    groups.forEach((group) => {
         const option = document.createElement('option');
-        option.value = idx;
-        option.textContent = `${parent.firstName} ${parent.lastName}`;
+        option.value = group.id;
+        option.textContent = group.nazwa || group.name;
         select.appendChild(option);
     });
 }
