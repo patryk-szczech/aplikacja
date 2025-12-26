@@ -3,932 +3,823 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kwitariusz - System Zarządzania Płatności</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        :root {
-            --color-primary: #667eea;
-            --color-secondary: #764ba2;
-            --color-bg: #f5f5f5;
-            --color-surface: #ffffff;
-            --color-text: #333;
-            --color-text-light: #999;
-            --color-border: #e0e0e0;
-        }
-        
-        body.dark-mode {
-            --color-bg: #1a1a1a;
-            --color-surface: #2d2d2d;
-            --color-text: #e0e0e0;
-            --color-text-light: #aaa;
-            --color-border: #444;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--color-bg);
-            color: var(--color-text);
-            transition: all 0.3s;
-        }
-        
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 250px;
-            height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            overflow-y: auto;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .sidebar-header {
-            margin-bottom: 30px;
-        }
-        
-        .sidebar h1 {
-            font-size: 18px;
-            font-weight: 600;
-        }
-        
-        .sidebar-nav {
-            flex: 1;
-        }
-        
-        .sidebar a {
-            display: block;
-            padding: 12px 15px;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 14px;
-        }
-        
-        .sidebar a:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateX(5px);
-        }
-        
-        .sidebar a.active {
-            background: rgba(255,255,255,0.3);
-            font-weight: 600;
-        }
-        
-        main {
-            margin-left: 250px;
-            padding: 30px;
-            min-height: 100vh;
-        }
-        
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            background: var(--color-surface);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .section {
-            display: none;
-        }
-        
-        .section.active {
-            display: block;
-            animation: fadeIn 0.3s;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .form-container {
-            background: var(--color-surface);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--color-border);
-            border-radius: 5px;
-            background: var(--color-surface);
-            color: var(--color-text);
-        }
-        
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .btn-primary {
-            background: #667eea;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        
-        .btn-primary:hover {
-            background: #5568d3;
-        }
-        
-        .btn-secondary {
-            background: #e0e0e0;
-            color: #333;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        
-        .btn-danger {
-            background: #ff6b6b;
-            color: white;
-            padding: 5px 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        
-        th, td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid var(--color-border);
-        }
-        
-        th {
-            font-weight: 600;
-            background: var(--color-bg);
-        }
-        
-        .table-container {
-            background: var(--color-surface);
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal.show {
-            display: flex;
-        }
-        
-        .modal-content {
-            background: var(--color-surface);
-            border-radius: 10px;
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--color-text-light);
-        }
-        
-        .modal-footer {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            justify-content: flex-end;
-        }
-        
-        .warning-box {
-            font-size: 12px;
-            color: #ff6b6b;
-            margin: 15px 0;
-            padding: 10px;
-            background: rgba(255,107,107,0.1);
-            border-radius: 5px;
-            border-left: 3px solid #ff6b6b;
-        }
-    </style>
+    <title>Kwitariusz Szkoły - System Zarządzania Opłatami</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="public/css/styles.css" rel="stylesheet">
 </head>
 <body>
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h1>📊 Kwitariusz</h1>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><i class="bi bi-calculator"></i> Kwitariusz Szkoły</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <button class="btn btn-outline-light btn-sm" id="themeToggle" title="Zmień motyw">
+                            <i class="bi bi-sun-fill"></i>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#settingsModal">
+                            <i class="bi bi-gear"></i> Ustawienia
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">
+                            <i class="bi bi-info-circle"></i> O Aplikacji
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
-        
-        <nav class="sidebar-nav">
-            <a class="nav-item active" data-section="dashboard">📊 Dashboard</a>
-            <a class="nav-item" data-section="placowka">🏢 Dane Placówki</a>
-            <a class="nav-item" data-section="grupy">👥 Grupy</a>
-            <a class="nav-item" data-section="rodzice">👨👩 Rodzice</a>
-            <a class="nav-item" data-section="dzieci">👧 Dzieci</a>
-            <a class="nav-item" data-section="stawki">💰 Stawki</a>
-            <a class="nav-item" data-section="platnosci">💳 Płatności</a>
-        </nav>
-    </aside>
+    </nav>
 
-    <main>
-        <div class="header">
-            <h2 id="page-title">📊 Dashboard</h2>
-            <button class="theme-toggle" id="themeToggle">🌙</button>
-        </div>
+    <!-- MAIN CONTAINER -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- SIDEBAR -->
+            <nav class="col-md-2 d-md-block bg-light sidebar">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" onclick="showSection('dashboard')">
+                                <i class="bi bi-graph-up"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('placowka')">
+                                <i class="bi bi-building"></i> Placówka
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('grupy')">
+                                <i class="bi bi-collection"></i> Grupy
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('rodzice')">
+                                <i class="bi bi-people"></i> Rodzice
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('dzieci')">
+                                <i class="bi bi-person-lines-fill"></i> Dzieci
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('stawki')">
+                                <i class="bi bi-cash-coin"></i> Stawki
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('obecnosci')">
+                                <i class="bi bi-calendar-check"></i> Obecności
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('platnosci')">
+                                <i class="bi bi-credit-card"></i> Płatności
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('raporty')">
+                                <i class="bi bi-file-earmark-pdf"></i> Raporty
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('import')">
+                                <i class="bi bi-upload"></i> Import
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('backup')">
+                                <i class="bi bi-cloud-arrow-down"></i> Backup
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
 
-        <!-- DANE PLACÓWKI -->
-        <section id="placowka" class="section">
-            <div class="form-container">
-                <h3>Dane Placówki</h3>
-                <form id="placowkaForm">
-                    <div class="form-group">
-                        <label>Nazwa Placówki *</label>
-                        <input type="text" id="placowkaNazwa" required>
+            <!-- MAIN CONTENT -->
+            <main class="col-md-10 ms-sm-auto px-md-4">
+                <!-- DASHBOARD -->
+                <section id="dashboard" class="content-section active">
+                    <div class="d-flex justify-content-between align-items-center my-4">
+                        <h1>📊 Dashboard</h1>
                     </div>
-                    <div class="form-group">
-                        <label>Adres</label>
-                        <input type="text" id="placowkaAdres">
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="card stat-card">
+                                <div class="card-body">
+                                    <h6 class="card-title text-muted">Rodzice</h6>
+                                    <h2 id="statRodzice">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card">
+                                <div class="card-body">
+                                    <h6 class="card-title text-muted">Dzieci</h6>
+                                    <h2 id="statDzieci">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card">
+                                <div class="card-body">
+                                    <h6 class="card-title text-muted">Opłacone</h6>
+                                    <h2 id="statOplacone">0 zł</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card text-danger">
+                                <div class="card-body">
+                                    <h6 class="card-title text-muted">Zaległości</h6>
+                                    <h2 id="statZaleglosci">0 zł</h2>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Telefon</label>
-                        <input type="tel" id="placowkaTelefon">
+
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Ostatnie Płatności</h5>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Rodzic</th>
+                                                <th>Dziecko</th>
+                                                <th>Kwota</th>
+                                                <th>Data</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recentPayments">
+                                            <tr><td colspan="5" class="text-center text-muted">Brak płatności</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="placowkaEmail">
+                </section>
+
+                <!-- PLACÓWKA -->
+                <section id="placowka" class="content-section">
+                    <div class="my-4">
+                        <h1>🏢 Dane Placówki</h1>
                     </div>
-                    <button type="submit" class="btn-primary">Zapisz</button>
-                </form>
-            </div>
-        </section>
+                    <div class="card">
+                        <div class="card-body">
+                            <form id="placowkaForm">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Nazwa Placówki</label>
+                                        <input type="text" class="form-control" id="placowkaNazwa" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Adres</label>
+                                        <input type="text" class="form-control" id="placowkaAdres">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Telefon</label>
+                                        <input type="tel" class="form-control" id="placowkaTelefon">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="placowkaEmail">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle"></i> Zapisz
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
 
-        <!-- GRUPY -->
-        <section id="grupy" class="section">
-            <button class="btn-primary" id="addGroupBtn">+ Dodaj Grupę/Klasę</button>
-            <div class="table-container">
-                <h3>Grupy/Klasy</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nazwa</th>
-                            <th>Opis</th>
-                            <th>Akcje</th>
-                        </tr>
-                    </thead>
-                    <tbody id="groupsTable">
-                        <tr><td colspan="3">Brak grup</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+                <!-- GRUPY -->
+                <section id="grupy" class="content-section">
+                    <div class="d-flex justify-content-between align-items-center my-4">
+                        <h1>👥 Grupy</h1>
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#grupaModal">
+                            <i class="bi bi-plus-circle"></i> Dodaj Grupę
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nazwa</th>
+                                        <th>Opis</th>
+                                        <th>Akcje</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="grupiTable">
+                                    <tr><td colspan="3" class="text-center text-muted">Brak grup</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
 
-        <!-- RODZICE -->
-        <section id="rodzice" class="section">
-            <button class="btn-primary" id="addParentBtn">+ Dodaj Rodzica</button>
-            <div class="table-container">
-                <h3>Rodzice</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Imię</th>
-                            <th>Nazwisko</th>
-                            <th>Telefon</th>
-                            <th>Email</th>
-                            <th>Akcje</th>
-                        </tr>
-                    </thead>
-                    <tbody id="parentsTable">
-                        <tr><td colspan="5">Brak rodziców</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+                <!-- RODZICE -->
+                <section id="rodzice" class="content-section">
+                    <div class="d-flex justify-content-between align-items-center my-4">
+                        <h1>👨‍👩‍👧‍👦 Rodzice</h1>
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#rodzicModal">
+                            <i class="bi bi-plus-circle"></i> Dodaj Rodzica
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Imię</th>
+                                        <th>Nazwisko</th>
+                                        <th>Email</th>
+                                        <th>Telefon</th>
+                                        <th>Akcje</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rodziceTable">
+                                    <tr><td colspan="5" class="text-center text-muted">Brak rodziców</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
 
-        <!-- DZIECI -->
-        <section id="dzieci" class="section">
-            <button class="btn-primary" id="addChildBtn">+ Dodaj Dziecko</button>
-            <div class="table-container">
-                <h3>Dzieci</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Imię</th>
-                            <th>Nazwisko</th>
-                            <th>Klasa</th>
-                            <th>Rodzice</th>
-                            <th>Akcje</th>
-                        </tr>
-                    </thead>
-                    <tbody id="childrenTable">
-                        <tr><td colspan="5">Brak dzieci</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+                <!-- DZIECI -->
+                <section id="dzieci" class="content-section">
+                    <div class="d-flex justify-content-between align-items-center my-4">
+                        <h1>👧 Dzieci</h1>
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#dzieckoModal">
+                            <i class="bi bi-plus-circle"></i> Dodaj Dziecko
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Imię</th>
+                                        <th>Nazwisko</th>
+                                        <th>Rodzic</th>
+                                        <th>Grupa</th>
+                                        <th>Akcje</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dzieciTable">
+                                    <tr><td colspan="5" class="text-center text-muted">Brak dzieci</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
 
-        <!-- STAWKI -->
-        <section id="stawki" class="section">
-            <button class="btn-primary" id="addRateBtn">+ Dodaj Stawkę</button>
-            <div class="table-container">
-                <h3>Stawki</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Grupa</th>
-                            <th>Kategoria</th>
-                            <th>Kwota</th>
-                            <th>Akcje</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ratesTable">
-                        <tr><td colspan="4">Brak stawek</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+                <!-- STAWKI -->
+                <section id="stawki" class="content-section">
+                    <div class="d-flex justify-content-between align-items-center my-4">
+                        <h1>💰 Stawki</h1>
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#stawkaModal">
+                            <i class="bi bi-plus-circle"></i> Dodaj Stawkę
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Grupa</th>
+                                        <th>Kategoria</th>
+                                        <th>Kwota</th>
+                                        <th>Od</th>
+                                        <th>Do</th>
+                                        <th>Akcje</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stawkiTable">
+                                    <tr><td colspan="6" class="text-center text-muted">Brak stawek</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
 
-        <!-- PŁATNOŚCI -->
-        <section id="platnosci" class="section">
-            <button class="btn-primary" id="addPaymentBtn">+ Dodaj Płatność</button>
-            <div class="table-container">
-                <h3>Płatności</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Rodzic</th>
-                            <th>Dziecko</th>
-                            <th>Kwota</th>
-                            <th>Data</th>
-                            <th>Akcje</th>
-                        </tr>
-                    </thead>
-                    <tbody id="paymentsTable">
-                        <tr><td colspan="5">Brak płatności</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    </main>
+                <!-- OBECNOŚCI -->
+                <section id="obecnosci" class="content-section">
+                    <div class="my-4">
+                        <h1>📅 Obecności</h1>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Wybierz Dziecko</label>
+                                    <select class="form-select" id="dzieckoSelect">
+                                        <option value="">-- Wybierz --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Miesiąc</label>
+                                    <input type="month" class="form-control" id="obecnosciMiesiac">
+                                </div>
+                            </div>
+                            <div id="obecnosciCalendar"></div>
+                        </div>
+                    </div>
+                </section>
 
-    <!-- MODAL: Rodzic -->
-    <div id="addParentModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Dodaj Rodzica</h2>
-                <button class="close-btn" onclick="closeModal('addParentModal')">✕</button>
-            </div>
-            <form id="addParentForm">
-                <div class="warning-box">
-                    <strong>⚠️ Wymagane pola:</strong> Imię, Nazwisko, Telefon, Email
-                </div>
-                <div class="form-group">
-                    <label>Imię *</label>
-                    <input type="text" id="parentFirstName" required>
-                </div>
-                <div class="form-group">
-                    <label>Nazwisko *</label>
-                    <input type="text" id="parentLastName" required>
-                </div>
-                <div class="form-group">
-                    <label>Telefon *</label>
-                    <input type="tel" id="parentPhone" required>
-                </div>
-                <div class="form-group">
-                    <label>Email *</label>
-                    <input type="email" id="parentEmail" required>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeModal('addParentModal')">Anuluj</button>
-                    <button type="submit" class="btn-primary">Dodaj</button>
-                </div>
-            </form>
+                <!-- PŁATNOŚCI -->
+                <section id="platnosci" class="content-section">
+                    <div class="d-flex justify-content-between align-items-center my-4">
+                        <h1>💳 Płatności</h1>
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#platnoscModal">
+                            <i class="bi bi-plus-circle"></i> Dodaj Płatność
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Rodzic</th>
+                                        <th>Dziecko</th>
+                                        <th>Kwota</th>
+                                        <th>Data</th>
+                                        <th>Status</th>
+                                        <th>Akcje</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="platnosciTable">
+                                    <tr><td colspan="6" class="text-center text-muted">Brak płatności</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- RAPORTY -->
+                <section id="raporty" class="content-section">
+                    <div class="my-4">
+                        <h1>📊 Raporty</h1>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Raport Zaległości</h5>
+                                    <p class="card-text">Szczegółowy raport wszystkich zaległości</p>
+                                    <button class="btn btn-primary btn-sm" onclick="generateReport('zaleglosci')">
+                                        <i class="bi bi-download"></i> Pobierz PDF
+                                    </button>
+                                    <button class="btn btn-success btn-sm" onclick="generateReport('zaleglosci', 'excel')">
+                                        <i class="bi bi-download"></i> Pobierz Excel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Raport Płatności</h5>
+                                    <p class="card-text">Podsumowanie wszystkich wpłat</p>
+                                    <button class="btn btn-primary btn-sm" onclick="generateReport('platnosci')">
+                                        <i class="bi bi-download"></i> Pobierz PDF
+                                    </button>
+                                    <button class="btn btn-success btn-sm" onclick="generateReport('platnosci', 'excel')">
+                                        <i class="bi bi-download"></i> Pobierz Excel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Rachunek</h5>
+                                    <p class="card-text">Wygeneruj rachunek dla rodzica</p>
+                                    <select class="form-select form-select-sm mb-2" id="rodzicForInvoice">
+                                        <option value="">-- Wybierz rodzica --</option>
+                                    </select>
+                                    <button class="btn btn-primary btn-sm" onclick="generateInvoice()">
+                                        <i class="bi bi-receipt"></i> Rachunek
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Statystyki</h5>
+                                    <p class="card-text">Podsumowanie statystyczne</p>
+                                    <button class="btn btn-primary btn-sm" onclick="generateReport('statystyki')">
+                                        <i class="bi bi-download"></i> Pobierz PDF
+                                    </button>
+                                    <button class="btn btn-success btn-sm" onclick="generateReport('statystyki', 'excel')">
+                                        <i class="bi bi-download"></i> Pobierz Excel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- IMPORT -->
+                <section id="import" class="content-section">
+                    <div class="my-4">
+                        <h1>📤 Import Danych</h1>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5>Import z Pliku Bankowego (CSV/XLSX)</h5>
+                            <p class="text-muted">Importuj dane przelewów z wyrębem bankowym</p>
+                            <input type="file" class="form-control mb-3" id="importFile" accept=".csv,.xlsx,.xls">
+                            <button class="btn btn-primary" onclick="importBankData()">
+                                <i class="bi bi-upload"></i> Importuj
+                            </button>
+                            <div id="importResult" class="mt-3"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- BACKUP -->
+                <section id="backup" class="content-section">
+                    <div class="my-4">
+                        <h1>💾 Backup i Restore</h1>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Utwórz Backup</h5>
+                                    <p class="card-text">Stwórz kopię bezpieczeństwa bazy danych</p>
+                                    <button class="btn btn-success" onclick="createBackup()">
+                                        <i class="bi bi-cloud-arrow-up"></i> Backup Teraz
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Przywróć Backup</h5>
+                                    <p class="card-text">Przywróć dane z wcześniejszego backupu</p>
+                                    <button class="btn btn-warning" onclick="restoreBackup()">
+                                        <i class="bi bi-cloud-arrow-down"></i> Przywróć
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mt-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Historia Backupów</h5>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Nazwa</th>
+                                                <th>Rozmiar</th>
+                                                <th>Data</th>
+                                                <th>Akcje</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="backupTable">
+                                            <tr><td colspan="4" class="text-center text-muted">Brak backupów</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
         </div>
     </div>
 
-    <!-- MODAL: Dziecko -->
-    <div id="addChildModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Dodaj Dziecko</h2>
-                <button class="close-btn" onclick="closeModal('addChildModal')">✕</button>
-            </div>
-            <form id="addChildForm">
-                <div class="warning-box">
-                    <strong>⚠️ Wymagane pola:</strong> Imię, Nazwisko, Klasa, Główny rodzic
+    <!-- MODALS -->
+
+    <!-- Grupa Modal -->
+    <div class="modal fade" id="grupaModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nowa Grupa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="form-group">
-                    <label>Imię *</label>
-                    <input type="text" id="childFirstName" required>
-                </div>
-                <div class="form-group">
-                    <label>Nazwisko *</label>
-                    <input type="text" id="childLastName" required>
-                </div>
-                <div class="form-group">
-                    <label>Klasa *</label>
-                    <select id="childGroup" required>
-                        <option value="">-- Wybierz klasę --</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Główny rodzic *</label>
-                    <select id="childParent1" required>
-                        <option value="">-- Wybierz rodzica --</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Drugi rodzic (opcjonalnie)</label>
-                    <select id="childParent2">
-                        <option value="">-- Brak --</option>
-                    </select>
+                <div class="modal-body">
+                    <form id="grupaForm">
+                        <div class="mb-3">
+                            <label class="form-label">Nazwa Grupy</label>
+                            <input type="text" class="form-control" id="grupaNazwa" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Opis</label>
+                            <textarea class="form-control" id="grupaOpis"></textarea>
+                        </div>
+                    </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeModal('addChildModal')">Anuluj</button>
-                    <button type="submit" class="btn-primary">Dodaj</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-primary" onclick="saveGrupa()">Zapisz</button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
-    <!-- MODAL: Grupa -->
-    <div id="addGroupModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Dodaj Grupę/Klasę</h2>
-                <button class="close-btn" onclick="closeModal('addGroupModal')">✕</button>
-            </div>
-            <form id="addGroupForm">
-                <div class="form-group">
-                    <label>Nazwa *</label>
-                    <input type="text" id="groupName" required>
+    <!-- Rodzic Modal -->
+    <div class="modal fade" id="rodzicModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nowy Rodzic</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="form-group">
-                    <label>Opis</label>
-                    <input type="text" id="groupDescription">
+                <div class="modal-body">
+                    <form id="rodzicForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Imię</label>
+                                <input type="text" class="form-control" id="rodzicImie" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nazwisko</label>
+                                <input type="text" class="form-control" id="rodzicNazwisko" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" id="rodzicEmail">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Telefon</label>
+                                <input type="tel" class="form-control" id="rodzicTelefon">
+                            </div>
+                            </div>
+                    </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeModal('addGroupModal')">Anuluj</button>
-                    <button type="submit" class="btn-primary">Dodaj</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-primary" onclick="saveRodzic()">Zapisz</button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
-    <script>
-let parents = [];
-let children = [];
-let groups = [];
+    <!-- Dziecko Modal -->
+    <div class="modal fade" id="dzieckoModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nowe Dziecko</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="dzieckoForm">
+                        <div class="mb-3">
+                            <label class="form-label">Rodzic</label>
+                            <select class="form-select" id="dzieckoRodzic" required>
+                                <option value="">-- Wybierz --</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Grupa</label>
+                            <select class="form-select" id="dzieckoGrupa" required>
+                                <option value="">-- Wybierz --</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Imię</label>
+                            <input type="text" class="form-control" id="dzieckoImie" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nazwisko</label>
+                            <input type="text" class="form-control" id="dzieckoNazwisko" required>
+                        </div
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-primary" onclick="saveDziecko()">Zapisz</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-const isElectron = typeof window !== 'undefined' && typeof window.ipcRenderer !== 'undefined';
+    <!-- Stawka Modal -->
+    <div class="modal fade" id="stawkaModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nowa Stawka</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="stawkaForm">
+                        <div class="mb-3">
+                            <label class="form-label">Grupa</label>
+                            <select class="form-select" id="stawkaGrupa" required>
+                                <option value="">-- Wybierz --</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Kategoria</label>
+                            <select class="form-select" id="stawkaKategoria" required>
+                                <option value="">-- Wybierz --</option>
+                                <option value="sniardanie">Śniadanie</option>
+                                <option value="drugie_sniadanie">II Śniadanie</option>
+                                <option value="obiad">Obiad</option>
+                                <option value="podwieczorek">Podwieczorek</option>
+                                <option value="calkosc">Pełna opłata</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Kwota (zł)</label>
+                            <input type="number" class="form-control" id="stawkaKwota" step="0.01" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Od</label>
+                                <input type="date" class="form-control" id="stawkaDataOd">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Do</label>
+                                <input type="date" class="form-control" id="stawkaDataDo">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-primary" onclick="saveStawka()">Zapisz</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-// ============ MODAL FUNCTIONS ============
-function openModal(id) {
-    document.getElementById(id).classList.add('show');
-}
+    <!-- Platność Modal -->
+    <div class="modal fade" id="platnoscModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nowa Płatność</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="platnoscForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Rodzic</label>
+                                <select class="form-select" id="platnoscRodzic" required>
+                                    <option value="">-- Wybierz --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Dziecko</label>
+                                <select class="form-select" id="platnoscDziecko">
+                                    <option value="">-- Wybierz --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Kwota (zł)</label>
+                                <input type="number" class="form-control" id="platnoscKwota" step="0.01" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Data Płatności</label>
+                                <input type="date" class="form-control" id="platnoscData" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Kategoria</label>
+                                <select class="form-select" id="platnoscKategoria">
+                                    <option value="calkosc">Pełna opłata</option>
+                                    <option value="sniardanie">Śniadanie</option>
+                                    <option value="drugie_sniadanie">II Śniadanie</option>
+                                    <option value="obiad">Obiad</option>
+                                    <option value="podwieczorek">Podwieczorek</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" id="platnoscStatus">
+                                    <option value="opłacona">Opłacona</option>
+                                    <option value="oczekująca">Oczekująca</option>
+                                    <option value="zaległa">Zaległa</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Opis</label>
+                                <textarea class="form-control" id="platnoscOpis"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-primary" onclick="savePlatnosc()">Zapisz</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-function closeModal(id) {
-    document.getElementById(id).classList.remove('show');
-}
+    <!-- Settings Modal -->
+    <div class="modal fade" id="settingsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">⚙️ Ustawienia</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#emailSettings">Email</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#backupSettings">Backup</a>
+                        </li>
+                    </ul>
 
-document.querySelectorAll('.modal').forEach(modal => {
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.classList.remove('show');
-    });
-});
+                    <div class="tab-content mt-3">
+                        <!-- Email Settings -->
+                        <div id="emailSettings" class="tab-pane fade show active">
+                            <form id="emailForm">
+                                <div class="mb-3">
+                                    <label class="form-label">SMTP Host</label>
+                                    <input type="text" class="form-control" id="smtpHost" placeholder="smtp.gmail.com">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">SMTP Port</label>
+                                    <input type="number" class="form-control" id="smtpPort" placeholder="587">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">SMTP User</label>
+                                    <input type="email" class="form-control" id="smtpUser" placeholder="twoj@gmail.com">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">SMTP Password</label>
+                                    <input type="password" class="form-control" id="smtpPassword">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email Od</label>
+                                    <input type="email" class="form-control" id="emailOd">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Imię Nadawcy</label>
+                                    <input type="text" class="form-control" id="emailImie">
+                                </div>
+                                <button type="button" class="btn btn-warning btn-sm" onclick="testEmail()">
+                                    <i class="bi bi-send"></i> Testuj Połączenie
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="saveEmailSettings()">
+                                    <i class="bi bi-check-circle"></i> Zapisz
+                                </button>
+                            </form>
+                        </div>
 
-// ============ NAVIGATION ============
-document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        
-        item.classList.add('active');
-        const id = item.getAttribute('data-section');
-        document.getElementById(id).classList.add('active');
-        document.getElementById('page-title').textContent = item.textContent;
-        
-        if (id === 'rodzice') loadParents();
-        if (id === 'dzieci') loadChildren();
-        if (id === 'grupy') loadGroups();
-        if (id === 'placowka') loadPlacowka();
-    });
-});
+                        <!-- Backup Settings -->
+                        <div id="backupSettings" class="tab-pane fade">
+                            <p>Użyj zakładki <strong>Backup</strong> w głównym menu do zarządzania kopiami bezpieczeństwa.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-// ============ PLACÓWKA ============
-async function loadPlacowka() {
-    try {
-        if (isElectron && window.ipcRenderer) {
-            const data = await window.ipcRenderer.invoke('getPlacowka');
-            if (data) {
-                document.getElementById('placowkaNazwa').value = data.nazwa || '';
-                document.getElementById('placowkaAdres').value = data.adres || '';
-                document.getElementById('placowkaTelefon').value = data.telefon || '';
-                document.getElementById('placowkaEmail').value = data.email || '';
-            }
-        }
-    } catch (error) {
-        console.error('Error:', error);
-    }
-}
+    <!-- About Modal -->
+    <div class="modal fade" id="aboutModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">ℹ️ O Aplikacji</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h5>Kwitariusz Szkoły v1.5.0</h5>
+                    <p class="text-muted">System zarządzania opłatami szkolnymi</p>
+                    <hr>
+                    <p><strong>Autor:</strong> IGO-NET</p>
+                    </div>
+            </div>
+        </div>
+    </div>
 
-document.getElementById('placowkaForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const data = {
-        nazwa: document.getElementById('placowkaNazwa').value,
-        adres: document.getElementById('placowkaAdres').value,
-        telefon: document.getElementById('placowkaTelefon').value,
-        email: document.getElementById('placowkaEmail').value
-    };
-    
-    try {
-        if (isElectron && window.ipcRenderer) {
-            await window.ipcRenderer.invoke('addPlacowka', data);
-        }
-        alert('✅ Dane placówki zapisane!');
-    } catch (error) {
-        alert('❌ Błąd: ' + error.message);
-    }
-});
-
-// ============ GRUPY ============
-async function loadGroups() {
-    try {
-        if (isElectron && window.ipcRenderer) {
-            groups = await window.ipcRenderer.invoke('getGrupy', 1);
-        }
-        renderGroups();
-        populateGroupSelect();
-    } catch (error) {
-        console.error('Error:', error);
-    }
-}
-
-function renderGroups() {
-    const tbody = document.getElementById('groupsTable');
-    if (groups.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3">Brak grup</td></tr>';
-        return;
-    }
-    tbody.innerHTML = groups.map(g => `
-        <tr>
-            <td>${g.nazwa}</td>
-            <td>${g.opis || '-'}</td>
-            <td><button class="btn-danger" onclick="deleteGroup(${g.id})">Usuń</button></td>
-        </tr>
-    `).join('');
-}
-
-function populateGroupSelect() {
-    const select = document.getElementById('childGroup');
-    select.innerHTML = '<option value="">-- Wybierz klasę --</option>';
-    groups.forEach(g => {
-        const opt = document.createElement('option');
-        opt.value = g.id;
-        opt.textContent = g.nazwa;
-        select.appendChild(opt);
-    });
-}
-
-document.getElementById('addGroupBtn')?.addEventListener('click', () => {
-    openModal('addGroupModal');
-});
-
-document.getElementById('addGroupForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const data = {
-        placowka_id: 1,
-        nazwa: document.getElementById('groupName').value,
-        opis: document.getElementById('groupDescription').value
-    };
-    
-    try {
-        if (isElectron && window.ipcRenderer) {
-            const result = await window.ipcRenderer.invoke('addGrupa', data);
-            data.id = result.lastInsertRowid;
-        } else {
-            data.id = groups.length + 1;
-        }
-        groups.push(data);
-        closeModal('addGroupModal');
-        loadGroups();
-        alert('✅ Grupa dodana!');
-    } catch (error) {
-        alert('❌ Błąd: ' + error.message);
-    }
-});
-
-async function deleteGroup(id) {
-    if (confirm('Usunąć?')) {
-        try {
-            if (isElectron && window.ipcRenderer) {
-                await window.ipcRenderer.invoke('deleteGrupa', id);
-            }
-            groups = groups.filter(g => g.id !== id);
-            loadGroups();
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-}
-
-// ============ RODZICE ============
-async function loadParents() {
-    try {
-        if (isElectron && window.ipcRenderer) {
-            parents = await window.ipcRenderer.invoke('getRodzice', 1);
-        }
-        renderParents();
-        populateParentSelects();
-    } catch (error) {
-        console.error('Error:', error);
-    }
-}
-
-function renderParents() {
-    const tbody = document.getElementById('parentsTable');
-    if (parents.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5">Brak rodziców</td></tr>';
-        return;
-    }
-    tbody.innerHTML = parents.map(p => `
-        <tr>
-            <td>${p.imie}</td>
-            <td>${p.nazwisko}</td>
-            <td>${p.telefon || '-'}</td>
-            <td>${p.email || '-'}</td>
-            <td><button class="btn-danger" onclick="deleteParent(${p.id})">Usuń</button></td>
-        </tr>
-    `).join('');
-}
-
-function populateParentSelects() {
-    const s1 = document.getElementById('childParent1');
-    const s2 = document.getElementById('childParent2');
-    
-    s1.innerHTML = '<option value="">-- Wybierz rodzica --</option>';
-    s2.innerHTML = '<option value="">-- Brak --</option>';
-    
-    parents.forEach(p => {
-        const o1 = document.createElement('option');
-        o1.value = p.id;
-        o1.textContent = `${p.imie} ${p.nazwisko}`;
-        s1.appendChild(o1);
-        
-        const o2 = document.createElement('option');
-        o2.value = p.id;
-        o2.textContent = `${p.imie} ${p.nazwisko}`;
-        s2.appendChild(o2);
-    });
-}
-
-document.getElementById('addParentBtn')?.addEventListener('click', () => {
-    document.getElementById('addParentForm').reset();
-    openModal('addParentModal');
-});
-
-document.getElementById('addParentForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const firstName = document.getElementById('parentFirstName').value.trim();
-    const lastName = document.getElementById('parentLastName').value.trim();
-    const phone = document.getElementById('parentPhone').value.trim();
-    const email = document.getElementById('parentEmail').value.trim();
-    
-    if (!firstName || !lastName || !phone || !email) {
-        alert('⚠️ Wypełnij wszystkie wymagane pola!');
-        return;
-    }
-    
-    const data = {
-        placowka_id: 1,
-        imie: firstName,
-        nazwisko: lastName,
-        telefon: phone,
-        email: email,
-        adres: '',
-        miasto: '',
-        kod_pocztowy: ''
-    };
-    
-    try {
-        if (isElectron && window.ipcRenderer) {
-            const result = await window.ipcRenderer.invoke('addRodzic', data);
-            data.id = result.lastInsertRowid;
-        } else {
-            data.id = parents.length + 1;
-        }
-        parents.push(data);
-        closeModal('addParentModal');
-        loadParents();
-        alert('✅ Rodzic dodany!');
-    } catch (error) {
-        alert('❌ Błąd: ' + error.message);
-    }
-});
-
-async function deleteParent(id) {
-    if (confirm('Usunąć?')) {
-        try {
-            if (isElectron && window.ipcRenderer) {
-                await window.ipcRenderer.invoke('deleteRodzic', id);
-            }
-            parents = parents.filter(p => p.id !== id);
-            loadParents();
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-}
-
-// ============ DZIECI ============
-async function loadChildren() {
-    try {
-        if (isElectron && window.ipcRenderer) {
-            children = await window.ipcRenderer.invoke('getDzieci');
-        }
-        renderChildren();
-    } catch (error) {
-        console.error('Error:', error);
-    }
-}
-
-function renderChildren() {
-    const tbody = document.getElementById('childrenTable');
-    if (children.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5">Brak dzieci</td></tr>';
-        return;
-    }
-    tbody.innerHTML = children.map(c => {
-        const p1 = parents.find(p => p.id === c.rodzic_id);
-        const p2 = c.rodzic_id_2 ? parents.find(p => p.id === c.rodzic_id_2) : null;
-        const g = groups.find(g => g.id === c.grupa_id);
-        
-        let pText = p1 ? `${p1.imie} ${p1.nazwisko}` : '-';
-        if (p2) pText += `, ${p2.imie} ${p2.nazwisko}`;
-        
-        return `
-            <tr>
-                <td>${c.imie}</td>
-                <td>${c.nazwisko}</td>
-                <td>${g ? g.nazwa : '-'}</td>
-                <td>${pText}</td>
-                <td><button class="btn-danger" onclick="deleteChild(${c.id})">Usuń</button></td>
-            </tr>
-        `;
-    }).join('');
-}
-
-document.getElementById('addChildBtn')?.addEventListener('click', () => {
-    if (parents.length === 0) {
-        alert('⚠️ Dodaj najpierw rodzica!');
-        return;
-    }
-    document.getElementById('addChildForm').reset();
-    populateParentSelects();
-    openModal('addChildModal');
-});
-
-document.getElementById('addChildForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const firstName = document.getElementById('childFirstName').value.trim();
-    const lastName = document.getElementById('childLastName').value.trim();
-    const classId = document.getElementById('childGroup').value;
-    const parent1Id = document.getElementById('childParent1').value;
-    const parent2Id = document.getElementById('childParent2').value || null;
-    
-    if (!firstName) {
-        alert('⚠️ Wpisz imię dziecka!');
-        return;
-    }
-    if (!lastName) {
-        alert('⚠️ Wpisz nazwisko dziecka!');
-        return;
-    }
-    if (!classId) {
-        alert('⚠️ Wybierz klasę!');
-        return;
-    }
-    if (!parent1Id) {
-        alert('⚠️ Wybierz głównego rodzica!');
-        return;
-    }
-    
-    const data = {
-        rodzic_id: parseInt(parent1Id),
-        rodzic_id_2: parent2Id ? parseInt(parent2Id) : null,
-        grupa_id: parseInt(classId),
-        imie: firstName,
-        nazwisko: lastName,
-        data_urodzenia: ''
-    };
-    
-    try {
-        if (isElectron && window.ipcRenderer) {
-            const result = await window.ipcRenderer.invoke('addDziecko', data);
-            data.id = result.lastInsertRowid;
-        } else {
-            data.id = children.length + 1;
-        }
-        children.push(data);
-        closeModal('addChildModal');
-        loadChildren();
-        alert('✅ Dziecko dodane!');
-    } catch (error) {
-        alert('❌ Błąd: ' + error.message);
-    }
-});
-
-async function deleteChild(id) {
-    if (confirm('Usunąć?')) {
-        try {
-            if (isElectron && window.ipcRenderer) {
-                await window.ipcRenderer.invoke('deleteDziecko', id);
-            }
-            children = children.filter(c => c.id !== id);
-            loadChildren();
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-}
-
-// ============ INIT ============
-document.addEventListener('DOMContentLoaded', () => {
-    loadGroups();
-});
-
-// ============ THEME ============
-document.getElementById('themeToggle')?.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-    updateTheme();
-});
-
-function updateTheme() {
-    const toggle = document.getElementById('themeToggle');
-    if (toggle) {
-        toggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
-    }
-}
-
-if (localStorage.getItem('theme') === 'dark') {
-    document.body.classList.add('dark-mode');
-}
-updateTheme();
-    </script>
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="public/js/theme.js"></script>
+    <script src="public/js/ui.js"></script>
 </body>
 </html>
