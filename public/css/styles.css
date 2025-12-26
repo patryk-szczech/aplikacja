@@ -806,34 +806,39 @@ html, body {
 }
 
 /* ============ SIDEBAR ============ */
+
 .sidebar {
-    background-color: var(--surface);
-    border-right: 1px solid var(--border);
+    background-color: var(--color-charcoal-800);  /* CIEMNE TŁO - prawie czarne */
+    border-right: 2px solid var(--color-teal-500);  /* WIDOCZNA GRANICA */
     min-height: calc(100vh - 60px);
     overflow-y: auto;
+    padding-top: var(--space-16);
 }
 
 .sidebar .nav-link {
-    color: var(--text);
-    padding: var(--space-12) var(--space-24);
-    border-left: 3px solid transparent;
+    color: var(--color-gray-200);  /* JASNY TEKST - prawie biały */
+    padding: var(--space-16) var(--space-24);
+    border-left: 4px solid transparent;
     transition: all var(--duration-normal) var(--ease-standard);
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-normal);
+    cursor: pointer;
+    display: block;
+    text-decoration: none;
 }
 
 .sidebar .nav-link:hover {
-    background-color: var(--color-secondary-hover);
-    color: var(--primary-color);
+    background-color: rgba(50, 184, 198, 0.15);  /* CIEMNONIEBIESKI hover */
+    color: var(--color-teal-300);  /* JASNONIEBIESKA tekst */
+    border-left-color: var(--color-teal-300);
 }
 
 .sidebar .nav-link.active {
-    background-color: var(--color-secondary-active);
-    color: var(--primary-color);
-    border-left-color: var(--primary-color);
+    background-color: rgba(50, 184, 198, 0.25);  /* AKTYWNY - bardziej widoczny */
+    color: var(--color-teal-300);
+    border-left-color: var(--color-teal-300);
     font-weight: var(--font-weight-semibold);
 }
-
 /* ============ MAIN CONTENT ============ */
 main {
     background-color: var(--background);
