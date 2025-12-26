@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kwitariusz - System Zarządzania Opłatami</title>
+    <title>Kwitariusz Szkoły - Ochrona PIN</title>
     <style>
         * {
             margin: 0;
@@ -12,163 +12,327 @@
         }
 
         :root {
-            --primary: #2196F3;
-            --primary-dark: #1976D2;
-            --success: #4CAF50;
-            --warning: #FF9800;
-            --danger: #F44336;
-            --light: #F5F5F5;
-            --dark: #212121;
-            --border: #DDDFE2;
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #48bb78;
+            --danger: #f56565;
+            --bg: #f8f9fa;
+            --text: #333;
+            --border: #e2e8f0;
+            --card-bg: white;
+        }
+
+        [data-theme="dark"] {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #48bb78;
+            --danger: #f56565;
+            --bg: #1a1a1a;
+            --text: #f0f0f0;
+            --border: #333;
+            --card-bg: #2d2d2d;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--light);
-            color: var(--dark);
-        }
-
-        .container {
-            display: flex;
-            height: 100vh;
-        }
-
-        .sidebar {
-            width: 250px;
-            background: var(--dark);
-            color: white;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
             padding: 20px;
-            overflow-y: auto;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            color: var(--text);
         }
 
-        .sidebar h2 {
-            margin-bottom: 30px;
-            font-size: 18px;
-            border-bottom: 2px solid var(--primary);
-            padding-bottom: 10px;
-        }
-
-        .nav-item {
-            display: block;
-            padding: 12px 15px;
-            margin: 5px 0;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: white;
-            cursor: pointer;
-            border-radius: 4px;
-            text-align: left;
-            width: 100%;
-            transition: all 0.3s;
-        }
-
-        .nav-item:hover, .nav-item.active {
-            background: var(--primary);
-            transform: translateX(5px);
-        }
-
-        .main {
-            flex: 1;
+        /* ========== PIN SCREEN ========== */
+        .pin-screen {
             display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .header {
-            background: white;
-            padding: 20px 30px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            justify-content: center;
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            z-index: 9999;
         }
 
-        .header h1 {
-            font-size: 24px;
-            color: var(--dark);
+        .pin-container {
+            background: var(--card-bg);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
         }
 
-        .content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 30px;
+        .pin-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text);
         }
 
-        .section {
-            display: none;
+        .pin-subtitle {
+            color: #999;
+            margin-bottom: 30px;
+            font-size: 14px;
         }
 
-        .section.active {
-            display: block;
+        .pin-input-group {
+            margin-bottom: 30px;
         }
 
-        .table-container {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-
-        table {
+        .pin-input {
             width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            background: var(--primary);
-            color: white;
             padding: 15px;
-            text-align: left;
+            font-size: 24px;
+            letter-spacing: 10px;
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            text-align: center;
+            background: var(--bg);
+            color: var(--text);
             font-weight: 600;
         }
 
-        td {
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--border);
+        .pin-input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
         }
 
-        tr:hover {
-            background: #F9F9F9;
-        }
-
-        .form-group {
+        .pin-keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
             margin-bottom: 20px;
         }
 
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--dark);
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 14px;
-            font-family: inherit;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
-        }
-
-        .btn {
-            padding: 10px 20px;
+        .pin-key {
+            padding: 15px;
+            font-size: 18px;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--text);
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: 2px solid var(--border);
+        }
+
+        .pin-key:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .pin-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .pin-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
             transition: all 0.3s;
-            margin-right: 10px;
-            margin-bottom: 10px;
+        }
+
+        .pin-btn-enter {
+            background: var(--success);
+            color: white;
+        }
+
+        .pin-btn-enter:hover {
+            background: #38a169;
+        }
+
+        .pin-btn-clear {
+            background: var(--danger);
+            color: white;
+        }
+
+        .pin-btn-clear:hover {
+            background: #e53e3e;
+        }
+
+        .pin-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .pin-message.error {
+            background: rgba(245, 101, 101, 0.2);
+            color: var(--danger);
+            display: block;
+        }
+
+        .pin-message.success {
+            background: rgba(72, 187, 120, 0.2);
+            color: var(--success);
+            display: block;
+        }
+
+        /* ========== MAIN APP ========== */
+        .app-hidden {
+            display: none !important;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h1 {
+            color: var(--text);
+            font-size: 2.5em;
+            margin: 0;
+        }
+
+        .theme-settings {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            padding: 10px 15px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--text);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #999;
+            margin-bottom: 30px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .settings-panel {
+            background: var(--bg);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .settings-title {
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text);
+            font-size: 16px;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .setting-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .setting-group label {
+            font-weight: 600;
+            color: var(--text);
+            min-width: 120px;
+        }
+
+        input[type="number"], input[type="password"] {
+            padding: 10px 15px;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--card-bg);
+            color: var(--text);
+        }
+
+        input[type="number"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .control-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--bg);
+            border-radius: 10px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
         .btn-primary {
@@ -177,18 +341,18 @@
         }
 
         .btn-primary:hover {
-            background: var(--primary-dark);
+            background: #5568d3;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .btn-success {
+        .btn-secondary {
             background: var(--success);
             color: white;
         }
 
-        .btn-success:hover {
-            background: #45A049;
+        .btn-secondary:hover {
+            background: #38a169;
         }
 
         .btn-danger {
@@ -197,360 +361,640 @@
         }
 
         .btn-danger:hover {
-            background: #DA190B;
+            background: #e53e3e;
         }
 
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 12px;
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 10px;
+            margin-top: 20px;
         }
 
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
+        table {
             width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
+            border-collapse: collapse;
+            background: var(--card-bg);
         }
 
-        .modal.active {
-            display: flex;
+        th {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
         }
 
-        .modal-content {
-            background: white;
-            border-radius: 8px;
-            padding: 30px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-
-        .modal-header {
-            margin-bottom: 20px;
+        td {
+            padding: 15px;
             border-bottom: 1px solid var(--border);
-            padding-bottom: 15px;
+            color: var(--text);
         }
 
-        .modal-header h2 {
-            margin: 0;
-            color: var(--dark);
+        tr:hover {
+            background: var(--bg);
         }
 
-        .close-btn {
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--dark);
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .close-btn:hover {
-            color: var(--primary);
-        }
-
-        .card {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .card h3 {
-            margin-bottom: 15px;
-            color: var(--primary);
-        }
-
-        .stat-box {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        .type-badge {
             display: inline-block;
-            width: 23%;
-            margin-right: 2%;
-            margin-bottom: 20px;
-        }
-
-        .stat-box h4 {
-            color: var(--dark);
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        .stat-box .value {
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--primary);
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
+            padding: 6px 12px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
         }
 
-        .badge-success {
-            background: #E8F5E9;
+        .type-parent {
+            background: rgba(102, 126, 234, 0.2);
+            color: var(--primary);
+        }
+
+        .type-child {
+            background: rgba(72, 187, 120, 0.2);
             color: var(--success);
         }
 
-        .badge-danger {
-            background: #FFEBEE;
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            background: var(--border);
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .btn-small:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-delete {
+            background: rgba(245, 101, 101, 0.2);
             color: var(--danger);
         }
 
-        @media print {
-            body { font-size: 12px; }
-            .sidebar, .header, .nav-item, .btn { display: none; }
-            .content { padding: 0; }
+        .btn-delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .close {
+            color: #999;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: var(--text);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .amount-input {
+            width: 100px;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            text-align: right;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .security-section {
+            background: var(--bg);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 1px solid var(--danger);
+        }
+
+        .security-title {
+            font-weight: 600;
+            color: var(--danger);
+            margin-bottom: 15px;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="sidebar">
-            <h2>🎓 Kwitariusz</h2>
-            <button class="nav-item active" onclick="switchSection('dashboard')">📊 Dashboard</button>
-            <button class="nav-item" onclick="switchSection('children')">👨‍👧‍👦 Dzieci</button>
-            <button class="nav-item" onclick="switchSection('parents')">👨‍👩‍👧 Rodzice</button>
-            <button class="nav-item" onclick="switchSection('rates')">💰 Stawki</button>
-            <button class="nav-item" onclick="switchSection('invoices')">📄 Rachunki</button>
-            <button class="nav-item" onclick="switchSection('reports')">📈 Raporty</button>
-            <button class="nav-item" onclick="switchSection('email')">✉️ Email</button>
-        </div>
+    <!-- PIN SCREEN -->
+    <div id="pinScreen" class="pin-screen">
+        <div class="pin-container">
+            <div class="pin-title">🔐 Kwitariusz Szkoły</div>
+            <div class="pin-subtitle">Wpisz PIN aby uzyskać dostęp</div>
+            
+            <div class="pin-input-group">
+                <input type="password" id="pinInput" class="pin-input" placeholder="• • • •" maxlength="4">
+            </div>
 
-        <div class="main">
+            <div class="pin-keypad">
+                <button class="pin-key" onclick="addPinDigit('1')">1</button>
+                <button class="pin-key" onclick="addPinDigit('2')">2</button>
+                <button class="pin-key" onclick="addPinDigit('3')">3</button>
+                <button class="pin-key" onclick="addPinDigit('4')">4</button>
+                <button class="pin-key" onclick="addPinDigit('5')">5</button>
+                <button class="pin-key" onclick="addPinDigit('6')">6</button>
+                <button class="pin-key" onclick="addPinDigit('7')">7</button>
+                <button class="pin-key" onclick="addPinDigit('8')">8</button>
+                <button class="pin-key" onclick="addPinDigit('9')">9</button>
+                <button class="pin-key" onclick="addPinDigit('0')">0</button>
+                <button class="pin-key" onclick="clearPin()" style="grid-column: 1 / 2;">C</button>
+                <button class="pin-key" onclick="checkPin()" style="grid-column: 2 / 4; background: #48bb78; color: white;">OK</button>
+            </div>
+
+            <div id="pinMessage" class="pin-message"></div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="mainApp" class="app-hidden">
+        <div class="container">
             <div class="header">
-                <h1 id="sectionTitle">Dashboard</h1>
-                <div>
-                    <button class="btn btn-primary btn-sm" onclick="exportData()">💾 Backup</button>
+                <h1>📚 Kwitariusz Szkoły</h1>
+                <div class="theme-settings">
+                    <button class="theme-toggle" onclick="toggleTheme()">🌙 Tryb</button>
+                </div>
+            </div>
+            <p class="subtitle">System zarządzania opłatami rodziców</p>
+
+            <!-- STATYSTYKI -->
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">Rodzice</div>
+                    <div class="stat-value" id="statParents">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Dzieci</div>
+                    <div class="stat-value" id="statChildren">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Razem wpłacono</div>
+                    <div class="stat-value" id="statTotal">0 zł</div>
                 </div>
             </div>
 
-            <div class="content">
-                <div id="dashboard" class="section active">
-                    <div class="stat-box">
-                        <h4>Liczba dzieci</h4>
-                        <div class="value" id="childrenCount">0</div>
-                    </div>
-                    <div class="stat-box">
-                        <h4>Razem do zapłaty</h4>
-                        <div class="value" id="totalOwed">0 zł</div>
-                    </div>
-                    <div class="stat-box">
-                        <h4>Zapłacone</h4>
-                        <div class="value" id="totalPaid">0 zł</div>
-                    </div>
-                    <div class="stat-box">
-                        <h4>Zaległości</h4>
-                        <div class="value" id="totalDebt">0 zł</div>
+            <!-- USTAWIENIA STAWKI -->
+            <div class="settings-panel">
+                <div class="settings-title">⚙️ Ustawienia Stawki</div>
+                <div class="settings-grid">
+                    <div class="setting-group">
+                        <label for="stawkaInput">Stawka godzinowa:</label>
+                        <input type="number" id="stawkaInput" min="0" step="0.01" value="25">
+                        <span>zł/h</span>
+                        <button class="btn-secondary" onclick="zmienStawke()" style="margin-left: 10px;">Zapisz</button>
                     </div>
                 </div>
+            </div>
 
-                <div id="children" class="section">
-                    <button class="btn btn-primary" onclick="loadChildren()">👶 Załaduj dzieci</button>
-                    <div class="table-container">
-                        <table id="childrenTable">
-                            <thead>
-                                <tr>
-                                    <th>Imię</th>
-                                    <th>Nazwisko</th>
-                                    <th>Klasa</th>
-                                    <th>Grupa</th>
-                                    <th>Data urodzenia</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
+            <!-- USTAWIENIA BEZPIECZEŃSTWA -->
+            <div class="security-section">
+                <div class="security-title">🔒 Bezpieczeństwo - Zarządzanie PIN</div>
+                <div class="settings-grid">
+                    <div class="setting-group">
+                        <label for="newPinInput">Nowy PIN (4 cyfry):</label>
+                        <input type="password" id="newPinInput" placeholder="XXXX" maxlength="4">
+                        <button class="btn-danger" onclick="changePinCode()" style="margin-left: 10px;">Zmień PIN</button>
+                    </div>
+                    <div class="setting-group">
+                        <label for="resetCodeInput">Kod resetowania:</label>
+                        <input type="password" id="resetCodeInput" placeholder="Kod" maxlength="10">
+                        <button class="btn-danger" onclick="resetPin()" style="margin-left: 10px;">Resetuj PIN</button>
                     </div>
                 </div>
+            </div>
 
-                <div id="parents" class="section">
-                    <button class="btn btn-primary" onclick="loadParents()">👨‍👩 Załaduj rodziców</button>
-                    <div class="table-container">
-                        <table id="parentsTable">
-                            <thead>
-                                <tr>
-                                    <th>Imię</th>
-                                    <th>Nazwisko</th>
-                                    <th>Email</th>
-                                    <th>Telefon</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
+            <!-- PRZYCISKI AKCJI -->
+            <div class="control-section">
+                <button class="btn-primary" onclick="otworzyModalRodzica()">👨‍👩‍👧 Dodaj Rodzica</button>
+                <button class="btn-primary" onclick="otworzyModalDziecka()">👶 Dodaj Dziecko</button>
+                <button class="btn-secondary" onclick="eksportujDane()">📥 Eksportuj CSV</button>
+            </div>
 
-                <div id="rates" class="section">
-                    <button class="btn btn-primary" onclick="loadRates()">💰 Załaduj stawki</button>
-                    <div class="table-container">
-                        <table id="ratesTable">
-                            <thead>
-                                <tr>
-                                    <th>Typ</th>
-                                    <th>Kwota</th>
-                                    <th>Opis</th>
-                                    <th>Data</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
+            <!-- TABELA -->
+            <div class="table-wrapper">
+                <table id="tabela">
+                    <thead>
+                        <tr>
+                            <th>Lp.</th>
+                            <th>Imię i nazwisko</th>
+                            <th>Typ</th>
+                            <th>Data dodania</th>
+                            <th>Godziny</th>
+                            <th>Kwota (zł)</th>
+                            <th>Akcje</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaBody">
+                    </tbody>
+                </table>
+            </div>
 
-                <div id="invoices" class="section">
-                    <div class="card">
-                        <h3>Generowanie rachunków</h3>
-                        <div class="form-group">
-                            <label>Miesiąc:</label>
-                            <input type="month" id="invoiceMonth">
-                        </div>
-                        <button class="btn btn-success" onclick="generateInvoice()">📄 Wygeneruj</button>
-                    </div>
-                </div>
+            <div id="emptyState" class="empty-state">
+                <p>Brak danych</p>
+                <p style="font-size: 14px;">Dodaj pierwszego rodzica lub dziecko aby zacząć</p>
+            </div>
+        </div>
+    </div>
 
-                <div id="reports" class="section">
-                    <div class="card">
-                        <h3>Zestawienie wpłat</h3>
-                        <div class="form-group">
-                            <label>Miesiąc:</label>
-                            <input type="month" id="reportMonth" onchange="generatePaymentReport()">
-                        </div>
-                    </div>
-                    <div class="table-container">
-                        <table id="paymentsTable">
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Uczeń</th>
-                                    <th>Kwota</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
+    <!-- MODAL - DODAJ RODZICA -->
+    <div id="modalRodzica" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="zamknijModalRodzica()">&times;</span>
+            <div class="modal-header">👨‍👩‍👧 Dodaj Rodzica</div>
+            <input type="text" class="modal-input" id="inputImieRodzica" placeholder="Imię">
+            <input type="text" class="modal-input" id="inputNazwiskoRodzica" placeholder="Nazwisko">
+            <input type="number" class="modal-input" id="inputGodzinyRodzica" placeholder="Godziny" min="0" step="0.5">
+            <div class="modal-buttons">
+                <button class="btn-primary" onclick="dodajRodzica()">Dodaj</button>
+                <button class="btn-small" onclick="zamknijModalRodzica()">Anuluj</button>
+            </div>
+        </div>
+    </div>
 
-                <div id="email" class="section">
-                    <div class="card">
-                        <h3>Konfiguracja emaila</h3>
-                        <div class="form-group">
-                            <label>Email:</label>
-                            <input type="email" id="emailSender" placeholder="twoja.szkoła@gmail.com">
-                        </div>
-                        <div class="form-group">
-                            <label>Hasło aplikacji:</label>
-                            <input type="password" id="emailPassword">
-                        </div>
-                        <button class="btn btn-primary" onclick="saveEmailConfig()">💾 Zapisz</button>
-                        <button class="btn btn-success" onclick="testEmail()">🧪 Testuj</button>
-                    </div>
-                </div>
+    <!-- MODAL - DODAJ DZIECKO -->
+    <div id="modalDziecka" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="zamknijModalDziecka()">&times;</span>
+            <div class="modal-header">👶 Dodaj Dziecko</div>
+            <input type="text" class="modal-input" id="inputImieDziecka" placeholder="Imię">
+            <input type="text" class="modal-input" id="inputNazwiskoDziecka" placeholder="Nazwisko">
+            <input type="number" class="modal-input" id="inputGodzinyDziecka" placeholder="Godziny" min="0" step="0.5">
+            <div class="modal-buttons">
+                <button class="btn-primary" onclick="dodajDziecko()">Dodaj</button>
+                <button class="btn-small" onclick="zamknijModalDziecka()">Anuluj</button>
             </div>
         </div>
     </div>
 
     <script>
-        let db = {
-            children: [],
-            parents: [],
-            rates: [],
-            payments: [],
-            emailConfig: {}
-        };
+        // ZMIENNE GLOBALNE
+        let dane = [];
+        let stawka = 25;
+        let pinCode = '1234';
+        let currentTheme = 'light';
 
-        function switchSection(section) {
-            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-            document.getElementById(section).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            const titles = {
-                dashboard: 'Dashboard',
-                children: 'Zarządzanie dziećmi',
-                parents: 'Zarządzanie rodzicami',
-                rates: 'Stawki opłat',
-                invoices: 'Rachunki',
-                reports: 'Raporty',
-                email: 'Konfiguracja emaila'
-            };
-            document.getElementById('sectionTitle').textContent = titles[section];
+        // ========== PIN SCREEN ==========
+        let pinAttempts = 0;
+        let maxAttempts = 5;
 
-            if (section === 'dashboard') loadDashboard();
-        }
-
-        function loadDashboard() {
-            document.getElementById('childrenCount').textContent = db.children.length;
-            document.getElementById('totalOwed').textContent = '0 zł';
-            document.getElementById('totalPaid').textContent = '0 zł';
-            document.getElementById('totalDebt').textContent = '0 zł';
-        }
-
-        function loadChildren() {
-            const tbody = document.querySelector('#childrenTable tbody');
-            tbody.innerHTML = '<tr><td colspan="4">Brak danych</td></tr>';
-        }
-
-        function loadParents() {
-            const tbody = document.querySelector('#parentsTable tbody');
-            tbody.innerHTML = '<tr><td colspan="4">Brak danych</td></tr>';
-        }
-
-        function loadRates() {
-            const tbody = document.querySelector('#ratesTable tbody');
-            tbody.innerHTML = '<tr><td colspan="4">Brak danych</td></tr>';
-        }
-
-        function generateInvoice() {
-            alert('📄 Rachunek wygenerowany!');
-        }
-
-        function generatePaymentReport() {
-            document.querySelector('#paymentsTable tbody').innerHTML = '<tr><td colspan="3">Brak danych</td></tr>';
-        }
-
-        function exportData() {
-            alert('✅ Backup zapisany!');
-        }
-
-        function clearAll() {
-            if (confirm('⚠️ Czy na pewno usunąć wszystkie dane?')) {
-                alert('✅ Dane wyczyszczone!');
-                location.reload();
+        function addPinDigit(digit) {
+            const pinInput = document.getElementById('pinInput');
+            if (pinInput.value.length < 4) {
+                pinInput.value += digit;
+            }
+            if (pinInput.value.length === 4) {
+                setTimeout(checkPin, 500);
             }
         }
 
-        function saveEmailConfig() {
-            alert('✅ Konfiguracja zapisana!');
+        function clearPin() {
+            document.getElementById('pinInput').value = '';
+            document.getElementById('pinMessage').textContent = '';
+            document.getElementById('pinMessage').className = 'pin-message';
         }
 
-        function testEmail() {
-            alert('🧪 Test połączenia z emailem');
+        function checkPin() {
+            const pinInput = document.getElementById('pinInput');
+            const enteredPin = pinInput.value;
+
+            if (enteredPin === pinCode) {
+                document.getElementById('pinMessage').textContent = '✅ Dostęp przyznany!';
+                document.getElementById('pinMessage').className = 'pin-message success';
+                setTimeout(() => {
+                    document.getElementById('pinScreen').style.display = 'none';
+                    document.getElementById('mainApp').classList.remove('app-hidden');
+                    init();
+                }, 1000);
+            } else {
+                pinAttempts++;
+                const remaining = maxAttempts - pinAttempts;
+                document.getElementById('pinMessage').textContent = `❌ Błędny PIN! Pozostało: ${remaining} prób`;
+                document.getElementById('pinMessage').className = 'pin-message error';
+                pinInput.value = '';
+
+                if (pinAttempts >= maxAttempts) {
+                    alert('❌ Zbyt wiele prób! Aplikacja zostanie zamknięta.');
+                    window.close();
+                }
+            }
         }
 
-        document.getElementById('invoiceMonth').valueAsDate = new Date();
-        document.getElementById('reportMonth').valueAsDate = new Date();
-        loadDashboard();
+        // ========== THEME ==========
+        function toggleTheme() {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('theme', currentTheme);
+        }
+
+        function loadTheme() {
+            const saved = localStorage.getItem('theme') || 'light';
+            currentTheme = saved;
+            document.documentElement.setAttribute('data-theme', saved);
+        }
+
+        // ========== PIN MANAGEMENT ==========
+        function changePinCode() {
+            const newPin = document.getElementById('newPinInput').value;
+            if (newPin.length !== 4 || isNaN(newPin)) {
+                alert('❌ PIN musi zawierać dokładnie 4 cyfry!');
+                return;
+            }
+            pinCode = newPin;
+            localStorage.setItem('pin', pinCode);
+            alert('✅ PIN zmieniony pomyślnie!');
+            document.getElementById('newPinInput').value = '';
+        }
+
+        function resetPin() {
+            const resetCode = document.getElementById('resetCodeInput').value;
+            if (resetCode === 'reset2025') {
+                pinCode = '1234';
+                localStorage.setItem('pin', pinCode);
+                alert('✅ PIN został zresetowany do domyślnego: 1234');
+                document.getElementById('resetCodeInput').value = '';
+            } else {
+                alert('❌ Błędny kod resetowania!');
+            }
+        }
+
+        // ========== INITIALIZATION ==========
+        function init() {
+            zaladujDane();
+            zaladujStawke();
+            zaladujPin();
+            loadTheme();
+            odswiezTabele();
+        }
+
+        function zaladujPin() {
+            const saved = localStorage.getItem('pin');
+            if (saved) {
+                pinCode = saved;
+            }
+        }
+
+        // ZAPISZ DANE
+        function zapiszDane() {
+            localStorage.setItem('kwitariusz_dane', JSON.stringify(dane));
+        }
+
+        // ZAŁADUJ DANE
+        function zaladujDane() {
+            const saved = localStorage.getItem('kwitariusz_dane');
+            dane = saved ? JSON.parse(saved) : [];
+        }
+
+        // ZAPISZ STAWKĘ
+        function zapiszStawke() {
+            localStorage.setItem('kwitariusz_stawka', stawka.toString());
+        }
+
+        // ZAŁADUJ STAWKĘ
+        function zaladujStawke() {
+            const saved = localStorage.getItem('kwitariusz_stawka');
+            stawka = saved ? parseFloat(saved) : 25;
+            document.getElementById('stawkaInput').value = stawka;
+        }
+
+        // ZMIEŃ STAWKĘ
+        function zmienStawke() {
+            const nowaStawka = parseFloat(document.getElementById('stawkaInput').value);
+            if (isNaN(nowaStawka) || nowaStawka < 0) {
+                alert('Podaj prawidłową stawkę!');
+                return;
+            }
+            stawka = nowaStawka;
+            zapiszStawke();
+            odswiezTabele();
+            alert('✅ Stawka zmieniona na ' + stawka.toFixed(2) + ' zł/h');
+        }
+
+        // MODALS - RODZIC
+        function otworzyModalRodzica() {
+            document.getElementById('modalRodzica').style.display = 'block';
+            document.getElementById('inputImieRodzica').focus();
+        }
+
+        function zamknijModalRodzica() {
+            document.getElementById('modalRodzica').style.display = 'none';
+        }
+
+        // MODALS - DZIECKO
+        function otworzyModalDziecka() {
+            document.getElementById('modalDziecka').style.display = 'block';
+            document.getElementById('inputImieDziecka').focus();
+        }
+
+        function zamknijModalDziecka() {
+            document.getElementById('modalDziecka').style.display = 'none';
+        }
+
+        // DODAJ RODZICA
+        function dodajRodzica() {
+            const imie = document.getElementById('inputImieRodzica').value.trim();
+            const nazwisko = document.getElementById('inputNazwiskoRodzica').value.trim();
+            const godziny = parseFloat(document.getElementById('inputGodzinyRodzica').value) || 0;
+
+            if (!imie || !nazwisko) {
+                alert('Wpisz imię i nazwisko!');
+                return;
+            }
+
+            dane.push({
+                id: Date.now(),
+                imie: imie,
+                nazwisko: nazwisko,
+                typ: 'Rodzic',
+                data: new Date().toLocaleDateString('pl-PL'),
+                godziny: godziny,
+                kwota: godziny * stawka
+            });
+
+            zapiszDane();
+            zamknijModalRodzica();
+            odswiezTabele();
+            
+            document.getElementById('inputImieRodzica').value = '';
+            document.getElementById('inputNazwiskoRodzica').value = '';
+            document.getElementById('inputGodzinyRodzica').value = '';
+        }
+
+        // DODAJ DZIECKO
+        function dodajDziecko() {
+            const imie = document.getElementById('inputImieDziecka').value.trim();
+            const nazwisko = document.getElementById('inputNazwiskoDziecka').value.trim();
+            const godziny = parseFloat(document.getElementById('inputGodzinyDziecka').value) || 0;
+
+            if (!imie || !nazwisko) {
+                alert('Wpisz imię i nazwisko!');
+                return;
+            }
+
+            dane.push({
+                id: Date.now(),
+                imie: imie,
+                nazwisko: nazwisko,
+                typ: 'Dziecko',
+                data: new Date().toLocaleDateString('pl-PL'),
+                godziny: godziny,
+                kwota: godziny * stawka
+            });
+
+            zapiszDane();
+            zamknijModalDziecka();
+            odswiezTabele();
+            
+            document.getElementById('inputImieDziecka').value = '';
+            document.getElementById('inputNazwiskoDziecka').value = '';
+            document.getElementById('inputGodzinyDziecka').value = '';
+        }
+
+        // ODŚWIEŻ TABELĘ
+        function odswiezTabele() {
+            const tbody = document.getElementById('tabelaBody');
+            tbody.innerHTML = '';
+
+            if (dane.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                document.getElementById('tabela').style.display = 'none';
+            } else {
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('tabela').style.display = 'table';
+
+                dane.forEach((item, index) => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td><strong>${item.imie} ${item.nazwisko}</strong></td>
+                        <td><span class="type-badge type-${item.typ === 'Rodzic' ? 'parent' : 'child'}">${item.typ}</span></td>
+                        <td>${item.data}</td>
+                        <td><input type="number" class="amount-input" value="${item.godziny}" min="0" step="0.5" onchange="zmienGodziny(${item.id}, this.value)"></td>
+                        <td><strong>${item.kwota.toFixed(2)} zł</strong></td>
+                        <td><button class="btn-small btn-delete" onclick="usun(${item.id})">Usuń</button></td>
+                    `;
+                });
+
+                const rodzice = dane.filter(x => x.typ === 'Rodzic').length;
+                const dzieci = dane.filter(x => x.typ === 'Dziecko').length;
+                const razem = dane.reduce((sum, x) => sum + x.kwota, 0);
+
+                document.getElementById('statParents').textContent = rodzice;
+                document.getElementById('statChildren').textContent = dzieci;
+                document.getElementById('statTotal').textContent = razem.toFixed(2) + ' zł';
+            }
+        }
+
+        // ZMIEŃ GODZINY
+        function zmienGodziny(id, noweGodziny) {
+            const item = dane.find(x => x.id === id);
+            if (item) {
+                item.godziny = parseFloat(noweGodziny) || 0;
+                item.kwota = item.godziny * stawka;
+                zapiszDane();
+                odswiezTabele();
+            }
+        }
+
+        // USUŃ
+        function usun(id) {
+            if (confirm('Czy na pewno chcesz usunąć ten wpis?')) {
+                dane = dane.filter(x => x.id !== id);
+                zapiszDane();
+                odswiezTabele();
+            }
+        }
+
+        // EKSPORTUJ CSV
+        function eksportujDane() {
+            let csv = 'Lp.,Imię i nazwisko,Typ,Data,Godziny,Kwota (zł)\n';
+            dane.forEach((item, index) => {
+                csv += `${index + 1},"${item.imie} ${item.nazwisko}",${item.typ},${item.data},${item.godziny},${item.kwota.toFixed(2)}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'kwitariusz_' + new Date().toISOString().split('T')[0] + '.csv';
+            a.click();
+        }
+
+        // MODALS CLOSE
+        window.onclick = function(event) {
+            const modalRodzica = document.getElementById('modalRodzica');
+            const modalDziecka = document.getElementById('modalDziecka');
+            
+            if (event.target == modalRodzica) modalRodzica.style.display = 'none';
+            if (event.target == modalDziecka) modalDziecka.style.display = 'none';
+        }
+
+        // ENTER W INPUTACH
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('inputImieRodzica')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') dodajRodzica();
+            });
+            document.getElementById('inputImieDziecka')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') dodajDziecko();
+            });
+            document.getElementById('pinInput')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') checkPin();
+            });
+        });
     </script>
 </body>
 </html>
