@@ -10,7 +10,7 @@
     "build": "npm run electron-builder -- --publish=never"
   },
   "dependencies": {
-    "sqlite3": "^5.1.6",
+    "better-sqlite3": "^9.2.2",
     "nodemailer": "^6.9.3",
     "googleapis": "^118.0.0"
   },
