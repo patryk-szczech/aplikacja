@@ -18,7 +18,7 @@ jobs:
     - name: Install electron-builder
       run: npm install electron-builder --save-dev
     
-    - name: Build exe
+  - name: Build exe
   run: npm run build
   env:
     GH_TOKEN: ''
