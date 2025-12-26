@@ -3,823 +3,344 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kwitariusz Szkoły - System Zarządzania Opłatami</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="public/css/styles.css" rel="stylesheet">
+    <title>Kwitariusz Szkoły - System Zarządzania Płatności</title>
+    <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#"><i class="bi bi-calculator"></i> Kwitariusz Szkoły</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <button class="btn btn-outline-light btn-sm" id="themeToggle" title="Zmień motyw">
-                            <i class="bi bi-sun-fill"></i>
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#settingsModal">
-                            <i class="bi bi-gear"></i> Ustawienia
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">
-                            <i class="bi bi-info-circle"></i> O Aplikacji
-                        </a>
-                    </li>
-                </ul>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">KS</div>
+            <h1>Kwitariusz Szkoły</h1>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#dashboard" class="nav-item active" data-view="dashboard">
+                📊 Dashboard
+            </a>
+            <a href="#placowka" class="nav-item" data-view="placowka">
+                🏢 Dane Placówki
+            </a>
+            <a href="#grupy" class="nav-item" data-view="grupy">
+                👥 Grupy
+            </a>
+            <a href="#rodzice" class="nav-item" data-view="rodzice">
+                👨👩👧👦 Rodzice
+            </a>
+            <a href="#dzieci" class="nav-item" data-view="dzieci">
+                👧 Dzieci
+            </a>
+            <a href="#stawki" class="nav-item" data-view="stawki">
+                💰 Stawki
+            </a>
+            <a href="#obecnosci" class="nav-item" data-view="obecnosci">
+                📅 Obecności
+            </a>
+            <a href="#platnosci" class="nav-item" data-view="platnosci">
+                💳 Płatności
+            </a>
+            <a href="#raporty" class="nav-item" data-view="raporty">
+                📊 Raporty
+            </a>
+            <a href="#import" class="nav-item" data-view="import">
+                📤 Import Danych
+            </a>
+            <a href="#backup" class="nav-item" data-view="backup">
+                💾 Backup i Restore
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <header class="app-header">
+            <div class="header-left">
+                <button class="hamburger" id="hamburger">☰</button>
+                <h2 id="page-title">Dashboard</h2>
             </div>
-        </div>
-    </nav>
-
-    <!-- MAIN CONTAINER -->
-    <div class="container-fluid">
-        <div class="row">
-            <!-- SIDEBAR -->
-            <nav class="col-md-2 d-md-block bg-light sidebar">
-                <div class="position-sticky pt-3">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="#" onclick="showSection('dashboard')">
-                                <i class="bi bi-graph-up"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('placowka')">
-                                <i class="bi bi-building"></i> Placówka
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('grupy')">
-                                <i class="bi bi-collection"></i> Grupy
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('rodzice')">
-                                <i class="bi bi-people"></i> Rodzice
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('dzieci')">
-                                <i class="bi bi-person-lines-fill"></i> Dzieci
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('stawki')">
-                                <i class="bi bi-cash-coin"></i> Stawki
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('obecnosci')">
-                                <i class="bi bi-calendar-check"></i> Obecności
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('platnosci')">
-                                <i class="bi bi-credit-card"></i> Płatności
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('raporty')">
-                                <i class="bi bi-file-earmark-pdf"></i> Raporty
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('import')">
-                                <i class="bi bi-upload"></i> Import
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('backup')">
-                                <i class="bi bi-cloud-arrow-down"></i> Backup
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-
-            <!-- MAIN CONTENT -->
-            <main class="col-md-10 ms-sm-auto px-md-4">
-                <!-- DASHBOARD -->
-                <section id="dashboard" class="content-section active">
-                    <div class="d-flex justify-content-between align-items-center my-4">
-                        <h1>📊 Dashboard</h1>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="card stat-card">
-                                <div class="card-body">
-                                    <h6 class="card-title text-muted">Rodzice</h6>
-                                    <h2 id="statRodzice">0</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card stat-card">
-                                <div class="card-body">
-                                    <h6 class="card-title text-muted">Dzieci</h6>
-                                    <h2 id="statDzieci">0</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card stat-card">
-                                <div class="card-body">
-                                    <h6 class="card-title text-muted">Opłacone</h6>
-                                    <h2 id="statOplacone">0 zł</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card stat-card text-danger">
-                                <div class="card-body">
-                                    <h6 class="card-title text-muted">Zaległości</h6>
-                                    <h2 id="statZaleglosci">0 zł</h2>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mt-4">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>Ostatnie Płatności</h5>
-                                </div>
-                                <div class="card-body">
-                                    <table class="table table-sm">
-                                        <thead>
-                                            <tr>
-                                                <th>Rodzic</th>
-                                                <th>Dziecko</th>
-                                                <th>Kwota</th>
-                                                <th>Data</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="recentPayments">
-                                            <tr><td colspan="5" class="text-center text-muted">Brak płatności</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- PLACÓWKA -->
-                <section id="placowka" class="content-section">
-                    <div class="my-4">
-                        <h1>🏢 Dane Placówki</h1>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <form id="placowkaForm">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Nazwa Placówki</label>
-                                        <input type="text" class="form-control" id="placowkaNazwa" required>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Adres</label>
-                                        <input type="text" class="form-control" id="placowkaAdres">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Telefon</label>
-                                        <input type="tel" class="form-control" id="placowkaTelefon">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="placowkaEmail">
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-check-circle"></i> Zapisz
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- GRUPY -->
-                <section id="grupy" class="content-section">
-                    <div class="d-flex justify-content-between align-items-center my-4">
-                        <h1>👥 Grupy</h1>
-                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#grupaModal">
-                            <i class="bi bi-plus-circle"></i> Dodaj Grupę
-                        </button>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Nazwa</th>
-                                        <th>Opis</th>
-                                        <th>Akcje</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="grupiTable">
-                                    <tr><td colspan="3" class="text-center text-muted">Brak grup</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- RODZICE -->
-                <section id="rodzice" class="content-section">
-                    <div class="d-flex justify-content-between align-items-center my-4">
-                        <h1>👨‍👩‍👧‍👦 Rodzice</h1>
-                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#rodzicModal">
-                            <i class="bi bi-plus-circle"></i> Dodaj Rodzica
-                        </button>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Imię</th>
-                                        <th>Nazwisko</th>
-                                        <th>Email</th>
-                                        <th>Telefon</th>
-                                        <th>Akcje</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="rodziceTable">
-                                    <tr><td colspan="5" class="text-center text-muted">Brak rodziców</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- DZIECI -->
-                <section id="dzieci" class="content-section">
-                    <div class="d-flex justify-content-between align-items-center my-4">
-                        <h1>👧 Dzieci</h1>
-                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#dzieckoModal">
-                            <i class="bi bi-plus-circle"></i> Dodaj Dziecko
-                        </button>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Imię</th>
-                                        <th>Nazwisko</th>
-                                        <th>Rodzic</th>
-                                        <th>Grupa</th>
-                                        <th>Akcje</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dzieciTable">
-                                    <tr><td colspan="5" class="text-center text-muted">Brak dzieci</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- STAWKI -->
-                <section id="stawki" class="content-section">
-                    <div class="d-flex justify-content-between align-items-center my-4">
-                        <h1>💰 Stawki</h1>
-                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#stawkaModal">
-                            <i class="bi bi-plus-circle"></i> Dodaj Stawkę
-                        </button>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Grupa</th>
-                                        <th>Kategoria</th>
-                                        <th>Kwota</th>
-                                        <th>Od</th>
-                                        <th>Do</th>
-                                        <th>Akcje</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="stawkiTable">
-                                    <tr><td colspan="6" class="text-center text-muted">Brak stawek</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- OBECNOŚCI -->
-                <section id="obecnosci" class="content-section">
-                    <div class="my-4">
-                        <h1>📅 Obecności</h1>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Wybierz Dziecko</label>
-                                    <select class="form-select" id="dzieckoSelect">
-                                        <option value="">-- Wybierz --</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Miesiąc</label>
-                                    <input type="month" class="form-control" id="obecnosciMiesiac">
-                                </div>
-                            </div>
-                            <div id="obecnosciCalendar"></div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- PŁATNOŚCI -->
-                <section id="platnosci" class="content-section">
-                    <div class="d-flex justify-content-between align-items-center my-4">
-                        <h1>💳 Płatności</h1>
-                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#platnoscModal">
-                            <i class="bi bi-plus-circle"></i> Dodaj Płatność
-                        </button>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Rodzic</th>
-                                        <th>Dziecko</th>
-                                        <th>Kwota</th>
-                                        <th>Data</th>
-                                        <th>Status</th>
-                                        <th>Akcje</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="platnosciTable">
-                                    <tr><td colspan="6" class="text-center text-muted">Brak płatności</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- RAPORTY -->
-                <section id="raporty" class="content-section">
-                    <div class="my-4">
-                        <h1>📊 Raporty</h1>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Raport Zaległości</h5>
-                                    <p class="card-text">Szczegółowy raport wszystkich zaległości</p>
-                                    <button class="btn btn-primary btn-sm" onclick="generateReport('zaleglosci')">
-                                        <i class="bi bi-download"></i> Pobierz PDF
-                                    </button>
-                                    <button class="btn btn-success btn-sm" onclick="generateReport('zaleglosci', 'excel')">
-                                        <i class="bi bi-download"></i> Pobierz Excel
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Raport Płatności</h5>
-                                    <p class="card-text">Podsumowanie wszystkich wpłat</p>
-                                    <button class="btn btn-primary btn-sm" onclick="generateReport('platnosci')">
-                                        <i class="bi bi-download"></i> Pobierz PDF
-                                    </button>
-                                    <button class="btn btn-success btn-sm" onclick="generateReport('platnosci', 'excel')">
-                                        <i class="bi bi-download"></i> Pobierz Excel
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mt-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Rachunek</h5>
-                                    <p class="card-text">Wygeneruj rachunek dla rodzica</p>
-                                    <select class="form-select form-select-sm mb-2" id="rodzicForInvoice">
-                                        <option value="">-- Wybierz rodzica --</option>
-                                    </select>
-                                    <button class="btn btn-primary btn-sm" onclick="generateInvoice()">
-                                        <i class="bi bi-receipt"></i> Rachunek
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mt-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Statystyki</h5>
-                                    <p class="card-text">Podsumowanie statystyczne</p>
-                                    <button class="btn btn-primary btn-sm" onclick="generateReport('statystyki')">
-                                        <i class="bi bi-download"></i> Pobierz PDF
-                                    </button>
-                                    <button class="btn btn-success btn-sm" onclick="generateReport('statystyki', 'excel')">
-                                        <i class="bi bi-download"></i> Pobierz Excel
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- IMPORT -->
-                <section id="import" class="content-section">
-                    <div class="my-4">
-                        <h1>📤 Import Danych</h1>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <h5>Import z Pliku Bankowego (CSV/XLSX)</h5>
-                            <p class="text-muted">Importuj dane przelewów z wyrębem bankowym</p>
-                            <input type="file" class="form-control mb-3" id="importFile" accept=".csv,.xlsx,.xls">
-                            <button class="btn btn-primary" onclick="importBankData()">
-                                <i class="bi bi-upload"></i> Importuj
-                            </button>
-                            <div id="importResult" class="mt-3"></div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- BACKUP -->
-                <section id="backup" class="content-section">
-                    <div class="my-4">
-                        <h1>💾 Backup i Restore</h1>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Utwórz Backup</h5>
-                                    <p class="card-text">Stwórz kopię bezpieczeństwa bazy danych</p>
-                                    <button class="btn btn-success" onclick="createBackup()">
-                                        <i class="bi bi-cloud-arrow-up"></i> Backup Teraz
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Przywróć Backup</h5>
-                                    <p class="card-text">Przywróć dane z wcześniejszego backupu</p>
-                                    <button class="btn btn-warning" onclick="restoreBackup()">
-                                        <i class="bi bi-cloud-arrow-down"></i> Przywróć
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-12 mt-3">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>Historia Backupów</h5>
-                                </div>
-                                <div class="card-body">
-                                    <table class="table table-sm">
-                                        <thead>
-                                            <tr>
-                                                <th>Nazwa</th>
-                                                <th>Rozmiar</th>
-                                                <th>Data</th>
-                                                <th>Akcje</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="backupTable">
-                                            <tr><td colspan="4" class="text-center text-muted">Brak backupów</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </main>
-        </div>
-    </div>
-
-    <!-- MODALS -->
-
-    <!-- Grupa Modal -->
-    <div class="modal fade" id="grupaModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Nowa Grupa</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="grupaForm">
-                        <div class="mb-3">
-                            <label class="form-label">Nazwa Grupy</label>
-                            <input type="text" class="form-control" id="grupaNazwa" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Opis</label>
-                            <textarea class="form-control" id="grupaOpis"></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
-                    <button type="button" class="btn btn-primary" onclick="saveGrupa()">Zapisz</button>
+            <div class="header-right">
+                <button class="btn-theme" id="theme-toggle" title="Zmień motyw">🌙</button>
+                <div class="user-menu">
+                    <span>Admin</span>
                 </div>
             </div>
-        </div>
-    </div>
+        </header>
 
-    <!-- Rodzic Modal -->
-    <div class="modal fade" id="rodzicModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Nowy Rodzic</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <!-- Dashboard View -->
+        <section id="dashboard-view" class="view-container active">
+            <div class="dashboard-grid">
+                <div class="stat-card stat-rodzice">
+                    <div class="stat-icon">👨👩</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Rodzice</div>
+                        <div class="stat-value" id="stat-rodzice">0</div>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <form id="rodzicForm">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Imię</label>
-                                <input type="text" class="form-control" id="rodzicImie" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Nazwisko</label>
-                                <input type="text" class="form-control" id="rodzicNazwisko" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" id="rodzicEmail">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Telefon</label>
-                                <input type="tel" class="form-control" id="rodzicTelefon">
-                            </div>
-                            </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
-                    <button type="button" class="btn btn-primary" onclick="saveRodzic()">Zapisz</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Dziecko Modal -->
-    <div class="modal fade" id="dzieckoModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Nowe Dziecko</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="stat-card stat-dzieci">
+                    <div class="stat-icon">👧</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Dzieci</div>
+                        <div class="stat-value" id="stat-dzieci">0</div>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <form id="dzieckoForm">
-                        <div class="mb-3">
-                            <label class="form-label">Rodzic</label>
-                            <select class="form-select" id="dzieckoRodzic" required>
-                                <option value="">-- Wybierz --</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Grupa</label>
-                            <select class="form-select" id="dzieckoGrupa" required>
-                                <option value="">-- Wybierz --</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Imię</label>
-                            <input type="text" class="form-control" id="dzieckoImie" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Nazwisko</label>
-                            <input type="text" class="form-control" id="dzieckoNazwisko" required>
-                        </div
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
-                    <button type="button" class="btn btn-primary" onclick="saveDziecko()">Zapisz</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Stawka Modal -->
-    <div class="modal fade" id="stawkaModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Nowa Stawka</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="stat-card stat-oplacone">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Opłacone</div>
+                        <div class="stat-value" id="stat-oplacone">0 zł</div>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <form id="stawkaForm">
-                        <div class="mb-3">
-                            <label class="form-label">Grupa</label>
-                            <select class="form-select" id="stawkaGrupa" required>
-                                <option value="">-- Wybierz --</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Kategoria</label>
-                            <select class="form-select" id="stawkaKategoria" required>
-                                <option value="">-- Wybierz --</option>
-                                <option value="sniardanie">Śniadanie</option>
-                                <option value="drugie_sniadanie">II Śniadanie</option>
-                                <option value="obiad">Obiad</option>
-                                <option value="podwieczorek">Podwieczorek</option>
-                                <option value="calkosc">Pełna opłata</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Kwota (zł)</label>
-                            <input type="number" class="form-control" id="stawkaKwota" step="0.01" required>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Od</label>
-                                <input type="date" class="form-control" id="stawkaDataOd">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Do</label>
-                                <input type="date" class="form-control" id="stawkaDataDo">
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
-                    <button type="button" class="btn btn-primary" onclick="saveStawka()">Zapisz</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Platność Modal -->
-    <div class="modal fade" id="platnoscModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Nowa Płatność</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="platnoscForm">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Rodzic</label>
-                                <select class="form-select" id="platnoscRodzic" required>
-                                    <option value="">-- Wybierz --</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Dziecko</label>
-                                <select class="form-select" id="platnoscDziecko">
-                                    <option value="">-- Wybierz --</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Kwota (zł)</label>
-                                <input type="number" class="form-control" id="platnoscKwota" step="0.01" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Data Płatności</label>
-                                <input type="date" class="form-control" id="platnoscData" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Kategoria</label>
-                                <select class="form-select" id="platnoscKategoria">
-                                    <option value="calkosc">Pełna opłata</option>
-                                    <option value="sniardanie">Śniadanie</option>
-                                    <option value="drugie_sniadanie">II Śniadanie</option>
-                                    <option value="obiad">Obiad</option>
-                                    <option value="podwieczorek">Podwieczorek</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Status</label>
-                                <select class="form-select" id="platnoscStatus">
-                                    <option value="opłacona">Opłacona</option>
-                                    <option value="oczekująca">Oczekująca</option>
-                                    <option value="zaległa">Zaległa</option>
-                                </select>
-                            </div>
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">Opis</label>
-                                <textarea class="form-control" id="platnoscOpis"></textarea>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
-                    <button type="button" class="btn btn-primary" onclick="savePlatnosc()">Zapisz</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Settings Modal -->
-    <div class="modal fade" id="settingsModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">⚙️ Ustawienia</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="tab" href="#emailSettings">Email</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#backupSettings">Backup</a>
-                        </li>
-                    </ul>
-
-                    <div class="tab-content mt-3">
-                        <!-- Email Settings -->
-                        <div id="emailSettings" class="tab-pane fade show active">
-                            <form id="emailForm">
-                                <div class="mb-3">
-                                    <label class="form-label">SMTP Host</label>
-                                    <input type="text" class="form-control" id="smtpHost" placeholder="smtp.gmail.com">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">SMTP Port</label>
-                                    <input type="number" class="form-control" id="smtpPort" placeholder="587">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">SMTP User</label>
-                                    <input type="email" class="form-control" id="smtpUser" placeholder="twoj@gmail.com">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">SMTP Password</label>
-                                    <input type="password" class="form-control" id="smtpPassword">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Email Od</label>
-                                    <input type="email" class="form-control" id="emailOd">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Imię Nadawcy</label>
-                                    <input type="text" class="form-control" id="emailImie">
-                                </div>
-                                <button type="button" class="btn btn-warning btn-sm" onclick="testEmail()">
-                                    <i class="bi bi-send"></i> Testuj Połączenie
-                                </button>
-                                <button type="button" class="btn btn-primary btn-sm" onclick="saveEmailSettings()">
-                                    <i class="bi bi-check-circle"></i> Zapisz
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- Backup Settings -->
-                        <div id="backupSettings" class="tab-pane fade">
-                            <p>Użyj zakładki <strong>Backup</strong> w głównym menu do zarządzania kopiami bezpieczeństwa.</p>
-                        </div>
+                <div class="stat-card stat-zaleglości">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-content">
+                        <div class="stat-label">Zaległości</div>
+                        <div class="stat-value" id="stat-zaleglości">0 zł</div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- About Modal -->
-    <div class="modal fade" id="aboutModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">ℹ️ O Aplikacji</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <h5>Kwitariusz Szkoły v1.5.0</h5>
-                    <p class="text-muted">System zarządzania opłatami szkolnymi</p>
-                    <hr>
-                    <p><strong>Autor:</strong> IGO-NET</p>
-                    </div>
+            <div class="recent-payments">
+                <h3>Ostatnie Płatności</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Rodzic</th>
+                            <th>Dziecko</th>
+                            <th>Kwota</th>
+                            <th>Data</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-payments-body">
+                        <tr>
+                            <td colspan="5" class="empty-state">Brak płatności</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <!-- SCRIPTS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="public/js/theme.js"></script>
-    <script src="public/js/ui.js"></script>
+        <!-- Placówka View -->
+        <section id="placowka-view" class="view-container">
+            <h2>Dane Placówki</h2>
+            <div class="form-container">
+                <form id="placowka-form">
+                    <div class="form-group">
+                        <label for="placowka-nazwa">Nazwa Placówki *</label>
+                        <input type="text" id="placowka-nazwa" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="placowka-adres">Adres</label>
+                        <input type="text" id="placowka-adres">
+                    </div>
+                    <div class="form-group">
+                        <label for="placowka-telefon">Telefon</label>
+                        <input type="tel" id="placowka-telefon">
+                    </div>
+                    <div class="form-group">
+                        <label for="placowka-email">Email</label>
+                        <input type="email" id="placowka-email">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Zapisz</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Grupy View -->
+        <section id="grupy-view" class="view-container">
+            <h2>Grupy</h2>
+            <button class="btn btn-primary" id="add-grupa-btn">+ Dodaj Grupę</button>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nazwa</th>
+                        <th>Opis</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody id="grupy-body">
+                    <tr>
+                        <td colspan="3" class="empty-state">Brak grup</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Rodzice View -->
+        <section id="rodzice-view" class="view-container">
+            <h2>Rodzice</h2>
+            <button class="btn btn-primary" id="add-rodzic-btn">+ Dodaj Rodzica</button>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Imię</th>
+                        <th>Nazwisko</th>
+                        <th>Telefon</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody id="rodzice-body">
+                    <tr>
+                        <td colspan="4" class="empty-state">Brak rodziców</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Dzieci View -->
+        <section id="dzieci-view" class="view-container">
+            <h2>Dzieci</h2>
+            <button class="btn btn-primary" id="add-dziecko-btn">+ Dodaj Dziecko</button>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Imię</th>
+                        <th>Nazwisko</th>
+                        <th>Rodzic</th>
+                        <th>Grupa</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody id="dzieci-body">
+                    <tr>
+                        <td colspan="5" class="empty-state">Brak dzieci</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Stawki View -->
+        <section id="stawki-view" class="view-container">
+            <h2>Stawki</h2>
+            <button class="btn btn-primary" id="add-stawka-btn">+ Dodaj Stawkę</button>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Grupa</th>
+                        <th>Kategoria</th>
+                        <th>Kwota</th>
+                        <th>Od</th>
+                        <th>Do</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody id="stawki-body">
+                    <tr>
+                        <td colspan="6" class="empty-state">Brak stawek</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Obecności View -->
+        <section id="obecnosci-view" class="view-container">
+            <h2>Obecności</h2>
+            <!-- Calendar placeholder -->
+        </section>
+
+        <!-- Płatności View -->
+        <section id="platnosci-view" class="view-container">
+            <h2>Płatności</h2>
+            <button class="btn btn-primary" id="add-platnosc-btn">+ Dodaj Płatność</button>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Rodzic</th>
+                        <th>Dziecko</th>
+                        <th>Kwota</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody id="platnosci-body">
+                    <tr>
+                        <td colspan="6" class="empty-state">Brak płatności</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Raporty View -->
+        <section id="raporty-view" class="view-container">
+            <h2>Raporty</h2>
+            <div class="reports-grid">
+                <button class="report-card" id="report-zaleglości">
+                    <div class="report-icon">⚠️</div>
+                    <div class="report-title">Raport Zaległości</div>
+                    <div class="report-desc">Szczegółowy raport wszystkich zaległości</div>
+                </button>
+                <button class="report-card" id="report-platnosci">
+                    <div class="report-icon">✅</div>
+                    <div class="report-title">Raport Płatności</div>
+                    <div class="report-desc">Podsumowanie wszystkich wpłat</div>
+                </button>
+                <button class="report-card" id="report-rachunek">
+                    <div class="report-icon">📄</div>
+                    <div class="report-title">Rachunek</div>
+                    <div class="report-desc">Wygeneruj rachunek dla rodzica</div>
+                </button>
+                <button class="report-card" id="report-statystyki">
+                    <div class="report-icon">📈</div>
+                    <div class="report-title">Statystyki</div>
+                    <div class="report-desc">Podsumowanie statystyczne</div>
+                </button>
+            </div>
+        </section>
+
+        <!-- Import View -->
+        <section id="import-view" class="view-container">
+            <h2>Import Danych</h2>
+            <div class="import-container">
+                <div class="import-card">
+                    <h3>Import z Pliku Bankowego (CSV/XLSX)</h3>
+                    <p>Importuj dane przelewów z wyrębem bankowym</p>
+                    <input type="file" id="import-file" accept=".csv,.xlsx">
+                    <button class="btn btn-primary" id="import-btn">Importuj</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Backup View -->
+        <section id="backup-view" class="view-container">
+            <h2>Backup i Restore</h2>
+            <div class="backup-buttons">
+                <button class="btn btn-primary" id="create-backup-btn">Utwórz Backup</button>
+                <button class="btn btn-secondary" id="restore-backup-btn">Przywróć Backup</button>
+            </div>
+            <h3 style="margin-top: 40px;">Historia Backupów</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nazwa</th>
+                        <th>Rozmiar</th>
+                        <th>Data</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody id="backups-body">
+                    <tr>
+                        <td colspan="4" class="empty-state">Brak backupów</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <!-- Scripts -->
+    <script src="./theme.js"></script>
+    <script src="./styles.css"></script>
+    <script src="./database.js"></script>
+    <script src="./ui.js"></script>
+    <script src="./finance.js"></script>
+    <script src="./calendar.js"></script>
+    <script src="./reports.js"></script>
+    <script src="./email.js"></script>
+    <script src="./storage.js"></script>
+    <script src="./import.js"></script>
+    <script src="./sync.js"></script>
+    <script src="./main.js"></script>
 </body>
 </html>
