@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Kwitariusz Szkoły - System Zarządzania Płatności</title>
-    <link rel="stylesheet" href="./styles.css">
     <style>
         * {
             margin: 0;
@@ -13,10 +12,29 @@
             box-sizing: border-box;
         }
         
+        :root {
+            --color-primary: #667eea;
+            --color-secondary: #764ba2;
+            --color-bg: #f5f5f5;
+            --color-surface: #ffffff;
+            --color-text: #333;
+            --color-text-light: #999;
+            --color-border: #e0e0e0;
+        }
+        
+        body.dark-mode {
+            --color-bg: #1a1a1a;
+            --color-surface: #2d2d2d;
+            --color-text: #e0e0e0;
+            --color-text-light: #aaa;
+            --color-border: #444;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            transition: all 0.3s;
         }
         
         /* Sidebar */
@@ -31,12 +49,21 @@
             padding: 20px;
             overflow-y: auto;
             z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            margin-bottom: 30px;
         }
         
         .sidebar h1 {
             font-size: 18px;
-            margin-bottom: 30px;
             font-weight: 600;
+        }
+        
+        .sidebar-nav {
+            flex: 1;
         }
         
         .sidebar a {
@@ -61,11 +88,20 @@
             font-weight: 600;
         }
         
+        .sidebar-footer {
+            text-align: center;
+            font-size: 11px;
+            color: rgba(255,255,255,0.7);
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        
         /* Main Content */
         main {
             margin-left: 250px;
             padding: 30px;
             min-height: 100vh;
+            transition: all 0.3s;
         }
         
         .header {
@@ -73,7 +109,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
-            background: white;
+            background: var(--color-surface);
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -81,7 +117,25 @@
         
         .header h2 {
             font-size: 24px;
-            color: #333;
+            color: var(--color-text);
+        }
+        
+        .header-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.2);
         }
         
         /* Sections */
@@ -91,6 +145,12 @@
         
         .section.active {
             display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         /* Stats Grid */
@@ -102,7 +162,7 @@
         }
         
         .stat-card {
-            background: white;
+            background: var(--color-surface);
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -118,19 +178,19 @@
         
         .stat-card .label {
             font-size: 12px;
-            color: #999;
+            color: var(--color-text-light);
             text-transform: uppercase;
         }
         
         .stat-card .value {
             font-size: 24px;
             font-weight: bold;
-            color: #333;
+            color: var(--color-text);
         }
         
         /* Table */
         .table-container {
-            background: white;
+            background: var(--color-surface);
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             overflow: hidden;
@@ -139,7 +199,7 @@
         
         .table-container h3 {
             padding: 20px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--color-border);
             margin: 0;
         }
         
@@ -149,27 +209,28 @@
         }
         
         thead {
-            background: #f9f9f9;
+            background: var(--color-bg);
         }
         
         th, td {
             padding: 15px;
             text-align: left;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--color-border);
+            color: var(--color-text);
         }
         
         th {
             font-weight: 600;
-            color: #333;
+            color: var(--color-text);
         }
         
         tr:hover {
-            background: #f5f5f5;
+            background: var(--color-bg);
         }
         
         /* Forms */
         .form-container {
-            background: white;
+            background: var(--color-surface);
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -183,7 +244,7 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: #333;
+            color: var(--color-text);
         }
         
         .form-group input,
@@ -191,10 +252,13 @@
         .form-group textarea {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--color-border);
             border-radius: 5px;
             font-size: 14px;
             font-family: inherit;
+            background: var(--color-surface);
+            color: var(--color-text);
+            transition: all 0.3s;
         }
         
         .form-group input:focus,
@@ -237,21 +301,24 @@
         .btn-danger {
             background: #ff6b6b;
             color: white;
+            padding: 5px 10px;
+            font-size: 12px;
         }
         
         .btn-danger:hover {
             background: #ee5a52;
         }
         
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
         /* Empty State */
         .empty-state {
             text-align: center;
             padding: 40px;
-            color: #999;
-        }
-        
-        .empty-state p {
-            font-size: 16px;
+            color: var(--color-text-light);
         }
         
         /* Modal */
@@ -273,10 +340,10 @@
         }
         
         .modal-content {
-            background: white;
+            background: var(--color-surface);
             border-radius: 10px;
             padding: 30px;
-            max-width: 600px;
+            max-width: 500px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
@@ -291,6 +358,7 @@
         
         .modal-header h2 {
             margin: 0;
+            color: var(--color-text);
         }
         
         .close-btn {
@@ -298,7 +366,19 @@
             border: none;
             font-size: 24px;
             cursor: pointer;
-            color: #999;
+            color: var(--color-text-light);
+        }
+        
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
         }
         
         @media (max-width: 768px) {
@@ -322,6 +402,7 @@
                 left: -200px;
                 transition: left 0.3s;
                 z-index: 2000;
+                width: 200px;
             }
             
             .sidebar.show {
@@ -349,25 +430,38 @@
 <body>
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
-        <h1>📊 Kwitariusz</h1>
-        <a href="#dashboard" class="nav-item active" data-section="dashboard">📊 Dashboard</a>
-        <a href="#placowka" class="nav-item" data-section="placowka">🏢 Dane Placówki</a>
-        <a href="#grupy" class="nav-item" data-section="grupy">👥 Grupy</a>
-        <a href="#rodzice" class="nav-item" data-section="rodzice">👨👩 Rodzice</a>
-        <a href="#dzieci" class="nav-item" data-section="dzieci">👧 Dzieci</a>
-        <a href="#stawki" class="nav-item" data-section="stawki">💰 Stawki</a>
-        <a href="#obecnosci" class="nav-item" data-section="obecnosci">📅 Obecności</a>
-        <a href="#platnosci" class="nav-item" data-section="platnosci">💳 Płatności</a>
-        <a href="#raporty" class="nav-item" data-section="raporty">📊 Raporty</a>
-        <a href="#import" class="nav-item" data-section="import">📤 Import Danych</a>
-        <a href="#backup" class="nav-item" data-section="backup">💾 Backup</a>
+        <div class="sidebar-header">
+            <h1>📊 Kwitariusz</h1>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="#dashboard" class="nav-item active" data-section="dashboard">📊 Dashboard</a>
+            <a href="#placowka" class="nav-item" data-section="placowka">🏢 Dane Placówki</a>
+            <a href="#grupy" class="nav-item" data-section="grupy">👥 Grupy</a>
+            <a href="#rodzice" class="nav-item" data-section="rodzice">👨👩 Rodzice</a>
+            <a href="#dzieci" class="nav-item" data-section="dzieci">👧 Dzieci</a>
+            <a href="#stawki" class="nav-item" data-section="stawki">💰 Stawki</a>
+            <a href="#obecnosci" class="nav-item" data-section="obecnosci">📅 Obecności</a>
+            <a href="#platnosci" class="nav-item" data-section="platnosci">💳 Płatności</a>
+            <a href="#raporty" class="nav-item" data-section="raporty">📊 Raporty</a>
+            <a href="#import" class="nav-item" data-section="import">📤 Import Danych</a>
+            <a href="#backup" class="nav-item" data-section="backup">💾 Backup</a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <p>© 2025 IGO-NET</p>
+            <p>Kwitariusz v1.0</p>
+        </div>
     </aside>
 
     <!-- Main Content -->
     <main>
         <div class="header">
-            <h2 id="page-title">Dashboard</h2>
-            <div>Admin</div>
+            <h2 id="page-title">📊 Dashboard</h2>
+            <div class="header-right">
+                <button class="theme-toggle" id="themeToggle" title="Zmień motyw">🌙</button>
+                <span>Admin</span>
+            </div>
         </div>
 
         <!-- DASHBOARD SECTION -->
@@ -376,7 +470,7 @@
                 <div class="stat-card">
                     <div>
                         <div class="label">Rodzice</div>
-                        <div class="value" id="childrenCount">0</div>
+                        <div class="value" id="parentsCount">0</div>
                     </div>
                     <div class="icon">👨👩</div>
                 </div>
@@ -384,7 +478,7 @@
                 <div class="stat-card">
                     <div>
                         <div class="label">Dzieci</div>
-                        <div class="value" id="parentsCount">0</div>
+                        <div class="value" id="childrenCount">0</div>
                     </div>
                     <div class="icon">👧</div>
                 </div>
@@ -584,19 +678,19 @@
         <!-- RAPORTY SECTION -->
         <section id="raporty" class="section">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
-                <div style="background: white; padding: 20px; border-radius: 10px; text-align: center; cursor: pointer;" id="reportArrears">
+                <div style="background: var(--color-surface); padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.1);" id="reportArrears">
                     <div style="font-size: 40px; margin-bottom: 10px;">⚠️</div>
                     <h4>Raport Zaległości</h4>
                 </div>
-                <div style="background: white; padding: 20px; border-radius: 10px; text-align: center; cursor: pointer;" id="reportPayments">
+                <div style="background: var(--color-surface); padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.1);" id="reportPayments">
                     <div style="font-size: 40px; margin-bottom: 10px;">✅</div>
                     <h4>Raport Płatności</h4>
                 </div>
-                <div style="background: white; padding: 20px; border-radius: 10px; text-align: center; cursor: pointer;" id="reportInvoice">
+                <div style="background: var(--color-surface); padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.1);" id="reportInvoice">
                     <div style="font-size: 40px; margin-bottom: 10px;">📄</div>
                     <h4>Rachunek</h4>
                 </div>
-                <div style="background: white; padding: 20px; border-radius: 10px; text-align: center; cursor: pointer;" id="reportStats">
+                <div style="background: var(--color-surface); padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.1);" id="reportStats">
                     <div style="font-size: 40px; margin-bottom: 10px;">📈</div>
                     <h4>Statystyki</h4>
                 </div>
@@ -643,20 +737,132 @@
         </section>
     </main>
 
-    <!-- Scripts - WAŻNE: KOLEJNOŚĆ! -->
-    <script src="./theme.js"></script>
-    <script src="./ui.js"></script>
-    <script src="./finance.js"></script>
-    <script src="./calendar.js"></script>
-    <script src="./reports.js"></script>
-    <script src="./email.js"></script>
-    <script src="./storage.js"></script>
-    <script src="./import.js"></script>
-    <script src="./sync.js"></script>
-    <script src="./main.js"></script>
+    <!-- MODAL: Dodaj Rodzica -->
+    <div id="addParentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Dodaj Rodzica</h2>
+                <button class="close-btn" onclick="closeModal('addParentModal')">✕</button>
+            </div>
+            <form id="addParentForm">
+                <div class="form-group">
+                    <label>Imię *</label>
+                    <input type="text" id="parentFirstName" required>
+                </div>
+                <div class="form-group">
+                    <label>Nazwisko *</label>
+                    <input type="text" id="parentLastName" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="parentEmail">
+                </div>
+                <div class="form-group">
+                    <label>Telefon</label>
+                    <input type="tel" id="parentPhone">
+                </div>
+                <div class="form-group">
+                    <label>Adres</label>
+                    <input type="text" id="parentAddress">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('addParentModal')">Anuluj</button>
+                    <button type="submit" class="btn-primary">Dodaj</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
+    <!-- MODAL: Dodaj Dziecko -->
+    <div id="addChildModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Dodaj Dziecko</h2>
+                <button class="close-btn" onclick="closeModal('addChildModal')">✕</button>
+            </div>
+            <form id="addChildForm">
+                <div class="form-group">
+                    <label>Rodzic *</label>
+                    <select id="childParent" required>
+                        <option value="">-- Wybierz rodzica --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Imię *</label>
+                    <input type="text" id="childFirstName" required>
+                </div>
+                <div class="form-group">
+                    <label>Nazwisko *</label>
+                    <input type="text" id="childLastName" required>
+                </div>
+                <div class="form-group">
+                    <label>Grupa</label>
+                    <select id="childGroup">
+                        <option value="">-- Wybierz grupę --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Data urodzenia</label>
+                    <input type="date" id="childBirthDate">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('addChildModal')">Anuluj</button>
+                    <button type="submit" class="btn-primary">Dodaj</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
     <script>
-        // Simple navigation logic
+        // ============ GLOBAL STATE ============
+        let placowkaId = 1;
+        let parents = [];
+        let children = [];
+        let groups = [];
+        let currentSection = 'dashboard';
+
+        // ============ THEME TOGGLE ============
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            updateThemeIcon();
+        });
+
+        function updateThemeIcon() {
+            if (document.body.classList.contains('dark-mode')) {
+                themeToggle.textContent = '☀️';
+            } else {
+                themeToggle.textContent = '🌙';
+            }
+        }
+
+        // Load saved theme
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+        updateThemeIcon();
+
+        // ============ MODAL FUNCTIONS ============
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // Close modal on outside click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('show');
+                }
+            });
+        });
+
+        // ============ NAVIGATION ============
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -672,9 +878,229 @@
                 if (section) {
                     section.classList.add('active');
                     document.getElementById('page-title').textContent = item.textContent;
+                    
+                    // Load data for section
+                    if (sectionId === 'rodzice') loadParents();
+                    if (sectionId === 'dzieci') loadChildren();
+                    if (sectionId === 'grupy') loadGroups();
                 }
             });
         });
+
+        // ============ INIT ============
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboard();
+            setupEventListeners();
+        });
+
+        // ============ EVENT LISTENERS ============
+        function setupEventListeners() {
+            // Add buttons
+            document.getElementById('addParentBtn').addEventListener('click', () => {
+                document.getElementById('addParentForm').reset();
+                openModal('addParentModal');
+            });
+
+            document.getElementById('addChildBtn').addEventListener('click', () => {
+                if (parents.length === 0) {
+                    alert('⚠️ Najpierw dodaj rodzica!');
+                    return;
+                }
+                document.getElementById('addChildForm').reset();
+                populateParentSelect();
+                openModal('addChildModal');
+            });
+
+            // Forms
+            document.getElementById('addParentForm').addEventListener('submit', addParent);
+            document.getElementById('addChildForm').addEventListener('submit', addChild);
+        }
+
+        // ============ LOAD DATA ============
+        async function loadDashboard() {
+            try {
+                // Update stats
+                document.getElementById('parentsCount').textContent = parents.length;
+                document.getElementById('childrenCount').textContent = children.length;
+                document.getElementById('totalPaid').textContent = '0 zł';
+                document.getElementById('totalDebt').textContent = '0 zł';
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        async function loadParents() {
+            try {
+                // For now, use in-memory array
+                renderParentsTable();
+            } catch (error) {
+                console.error('Error loading parents:', error);
+            }
+        }
+
+        async function loadChildren() {
+            try {
+                renderChildrenTable();
+            } catch (error) {
+                console.error('Error loading children:', error);
+            }
+        }
+
+        async function loadGroups() {
+            try {
+                renderGroupsTable();
+            } catch (error) {
+                console.error('Error loading groups:', error);
+            }
+        }
+
+        // ============ RENDER TABLES ============
+        function renderParentsTable() {
+            const tbody = document.getElementById('parentsTable');
+            if (parents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Brak rodziców</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = parents.map((parent, idx) => `
+                <tr>
+                    <td>${parent.firstName}</td>
+                    <td>${parent.lastName}</td>
+                    <td>${parent.phone || '-'}</td>
+                    <td>${parent.email || '-'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-danger btn-sm" onclick="deleteParent(${idx})">Usuń</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderChildrenTable() {
+            const tbody = document.getElementById('childrenTable');
+            if (children.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Brak dzieci</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = children.map((child, idx) => `
+                <tr>
+                    <td>${child.firstName}</td>
+                    <td>${child.lastName}</td>
+                    <td>${parents[child.parentIdx]?.firstName} ${parents[child.parentIdx]?.lastName}</td>
+                    <td>${child.group || '-'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-danger btn-sm" onclick="deleteChild(${idx})">Usuń</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderGroupsTable() {
+            const tbody = document.getElementById('groupsTable');
+            if (groups.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="empty-state">Brak grup</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = groups.map((group, idx) => `
+                <tr>
+                    <td>${group.name}</td>
+                    <td>${group.description || '-'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-danger btn-sm" onclick="deleteGroup(${idx})">Usuń</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ============ ADD/DELETE FUNCTIONS ============
+        function addParent(e) {
+            e.preventDefault();
+            
+            const parent = {
+                firstName: document.getElementById('parentFirstName').value,
+                lastName: document.getElementById('parentLastName').value,
+                email: document.getElementById('parentEmail').value,
+                phone: document.getElementById('parentPhone').value,
+                address: document.getElementById('parentAddress').value
+            };
+
+            parents.push(parent);
+            closeModal('addParentModal');
+            renderParentsTable();
+            updateDashboard();
+            alert('✅ Rodzic dodany pomyślnie!');
+        }
+
+        function deleteParent(idx) {
+            if (confirm('Na pewno chcesz usunąć tego rodzica?')) {
+                parents.splice(idx, 1);
+                renderParentsTable();
+                updateDashboard();
+            }
+        }
+
+        function addChild(e) {
+            e.preventDefault();
+            
+            const parentIdx = document.getElementById('childParent').value;
+            
+            if (!parentIdx) {
+                alert('⚠️ Wybierz rodzica!');
+                return;
+            }
+
+            const child = {
+                firstName: document.getElementById('childFirstName').value,
+                lastName: document.getElementById('childLastName').value,
+                parentIdx: parseInt(parentIdx),
+                group: document.getElementById('childGroup').value,
+                birthDate: document.getElementById('childBirthDate').value
+            };
+
+            children.push(child);
+            closeModal('addChildModal');
+            renderChildrenTable();
+            updateDashboard();
+            alert('✅ Dziecko dodane pomyślnie!');
+        }
+
+        function deleteChild(idx) {
+            if (confirm('Na pewno chcesz usunąć to dziecko?')) {
+                children.splice(idx, 1);
+                renderChildrenTable();
+                updateDashboard();
+            }
+        }
+
+        function deleteGroup(idx) {
+            if (confirm('Na pewno chcesz usunąć tę grupę?')) {
+                groups.splice(idx, 1);
+                renderGroupsTable();
+            }
+        }
+
+        function populateParentSelect() {
+            const select = document.getElementById('childParent');
+            select.innerHTML = '<option value="">-- Wybierz rodzica --</option>';
+            parents.forEach((parent, idx) => {
+                const option = document.createElement('option');
+                option.value = idx;
+                option.textContent = `${parent.firstName} ${parent.lastName}`;
+                select.appendChild(option);
+            });
+        }
+
+        function updateDashboard() {
+            document.getElementById('parentsCount').textContent = parents.length;
+            document.getElementById('childrenCount').textContent = children.length;
+        }
     </script>
 </body>
 </html>
