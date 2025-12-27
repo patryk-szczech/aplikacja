@@ -1223,11 +1223,6 @@ small {
     overflow-x: auto;
 }
 
-/* ============ HIDE THEME TOGGLE ============ */
-#themeToggle {
-    display: none;
-}
-
 /* ============ SCROLLBAR ============ */
 ::-webkit-scrollbar {
     width: 10px;
