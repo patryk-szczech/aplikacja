@@ -1,14 +1,12 @@
-
-theme-dark-only.js
-// ============ DARK THEME ONLY ============
-
+// Usuń WSZYSTKO i wklej:
 document.addEventListener('DOMContentLoaded', function() {
     const htmlElement = document.documentElement;
-    
-    // Ustaw ZAWSZE ciemny motyw
+    const bodyElement = document.body;
     htmlElement.setAttribute('data-theme', 'dark');
-    document.body.setAttribute('data-theme', 'dark');
+    bodyElement.setAttribute('data-theme', 'dark');
+    document.documentElement.style.backgroundColor = '#1f2121';
+    document.body.style.backgroundColor = '#1f2121';
+    document.body.style.color = '#f5f5f5';
     localStorage.setItem('theme', 'dark');
-    
-    console.log('Motyw ustawiony: CIEMNY (dark mode only)');
+    console.log('✅ CIEMNY MOTYW');
 });
