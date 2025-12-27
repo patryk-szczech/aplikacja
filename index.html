@@ -4,33 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kwitariusz Szkoły - System Zarządzania Opłatami</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="public/css/styles.css" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <!-- ============ NAVBAR ============ -->
+    <nav class="navbar navbar-dark navbar-expand-lg sticky-top">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#"><i class="bi bi-calculator"></i> Kwitariusz Szkoły</a>
+            <a class="navbar-brand" href="#dashboard">
+                <i class="bi bi-book-half"></i> Kwitariusz Szkoły
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <button class="btn btn-outline-light btn-sm" id="themeToggle" title="Zmień motyw">
+                        <button id="themeToggle" class="btn btn-outline-light" title="Przełącz motyw">
                             <i class="bi bi-sun-fill"></i>
                         </button>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#settingsModal">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown">
                             <i class="bi bi-gear"></i> Ustawienia
                         </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="settingsDropdown">
+                            <li><a class="dropdown-item" href="#settings">Profil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#logout">Wyloguj</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">
-                            <i class="bi bi-info-circle"></i> O Aplikacji
+                        <a class="nav-link" href="#about">
+                            <i class="bi bi-info-circle"></i> O aplikacji
                         </a>
                     </li>
                 </ul>
@@ -38,186 +51,190 @@
         </div>
     </nav>
 
-    <!-- MAIN CONTAINER -->
-    <div class="container-fluid">
-        <div class="row">
-            <!-- SIDEBAR -->
-            <nav class="col-md-2 d-md-block bg-light sidebar">
-                <div class="position-sticky pt-3">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="#" onclick="showSection('dashboard')">
-                                <i class="bi bi-graph-up"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('placowka')">
-                                <i class="bi bi-building"></i> Placówka
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('grupy')">
-                                <i class="bi bi-collection"></i> Grupy
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('rodzice')">
-                                <i class="bi bi-people"></i> Rodzice
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('dzieci')">
-                                <i class="bi bi-person-lines-fill"></i> Dzieci
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('stawki')">
-                                <i class="bi bi-cash-coin"></i> Stawki
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('obecnosci')">
-                                <i class="bi bi-calendar-check"></i> Obecności
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('platnosci')">
-                                <i class="bi bi-credit-card"></i> Płatności
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('raporty')">
-                                <i class="bi bi-file-earmark-pdf"></i> Raporty
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('import')">
-                                <i class="bi bi-upload"></i> Import
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="showSection('backup')">
-                                <i class="bi bi-cloud-arrow-down"></i> Backup
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+    <!-- ============ MAIN CONTAINER ============ -->
+    <div class="d-flex">
+        <!-- ============ SIDEBAR ============ -->
+        <aside class="sidebar">
+            <nav class="navbar-nav flex-column">
+                <!-- Dashboard -->
+                <a class="nav-link active" data-section="dashboard" href="#dashboard">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <!-- Dane Placówki -->
+                <a class="nav-link" data-section="facility" href="#facility">
+                    <i class="bi bi-building"></i>
+                    <span>Dane Placówki</span>
+                </a>
+
+                <!-- Grupy -->
+                <a class="nav-link" data-section="groups" href="#groups">
+                    <i class="bi bi-people"></i>
+                    <span>Grupy</span>
+                </a>
+
+                <!-- Rodzice -->
+                <a class="nav-link" data-section="parents" href="#parents">
+                    <i class="bi bi-person-hearts"></i>
+                    <span>Rodzice</span>
+                </a>
+
+                <!-- Dzieci -->
+                <a class="nav-link" data-section="children" href="#children">
+                    <i class="bi bi-person-check"></i>
+                    <span>Dzieci</span>
+                </a>
+
+                <!-- Stawki -->
+                <a class="nav-link" data-section="rates" href="#rates">
+                    <i class="bi bi-cash-coin"></i>
+                    <span>Stawki</span>
+                </a>
+
+                <!-- Obecności -->
+                <a class="nav-link" data-section="attendance" href="#attendance">
+                    <i class="bi bi-calendar-check"></i>
+                    <span>Obecności</span>
+                </a>
+
+                <!-- Płatności -->
+                <a class="nav-link" data-section="payments" href="#payments">
+                    <i class="bi bi-credit-card"></i>
+                    <span>Płatności</span>
+                </a>
+
+                <!-- Raporty -->
+                <a class="nav-link" data-section="reports" href="#reports">
+                    <i class="bi bi-bar-chart"></i>
+                    <span>Raporty</span>
+                </a>
+
+                <!-- Import -->
+                <a class="nav-link" data-section="import" href="#import">
+                    <i class="bi bi-cloud-arrow-up"></i>
+                    <span>Import Danych</span>
+                </a>
+
+                <!-- Backup -->
+                <a class="nav-link" data-section="backup" href="#backup">
+                    <i class="bi bi-cloud-check"></i>
+                    <span>Backup i Restore</span>
+                </a>
             </nav>
+        </aside>
 
-            <!-- MAIN CONTENT -->
-            <main class="col-md-10 ms-sm-auto px-md-4">
-                <!-- DASHBOARD -->
-                <section id="dashboard" class="content-section active">
-                    <div class="d-flex justify-content-between align-items-center my-4">
-                        <h1>📊 Dashboard</h1>
-                    </div>
+        <!-- ============ MAIN CONTENT ============ -->
+        <main class="flex-grow-1">
+            <!-- ============ DASHBOARD SECTION ============ -->
+            <section id="dashboard" class="section active">
+                <h1 class="mb-4">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </h1>
 
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="card stat-card">
-                                <div class="card-body">
-                                    <h6 class="card-title text-muted">Rodzice</h6>
-                                    <h2 id="statRodzice">0</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card stat-card">
-                                <div class="card-body">
-                                    <h6 class="card-title text-muted">Dzieci</h6>
-                                    <h2 id="statDzieci">0</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card stat-card">
-                                <div class="card-body">
-                                    <h6 class="card-title text-muted">Opłacone</h6>
-                                    <h2 id="statOplacone">0 zł</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card stat-card text-danger">
-                                <div class="card-body">
-                                    <h6 class="card-title text-muted">Zaległości</h6>
-                                    <h2 id="statZaleglosci">0 zł</h2>
-                                </div>
-                            </div>
+                <!-- Stat Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card stat-card">
+                            <small class="text-muted">Rodzice</small>
+                            <h2 id="parentsCount">0</h2>
                         </div>
                     </div>
-
-                    <div class="row mt-4">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>Ostatnie Płatności</h5>
-                                </div>
-                                <div class="card-body">
-                                    <table class="table table-sm">
-                                        <thead>
-                                            <tr>
-                                                <th>Rodzic</th>
-                                                <th>Dziecko</th>
-                                                <th>Kwota</th>
-                                                <th>Data</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="recentPayments">
-                                            <tr><td colspan="5" class="text-center text-muted">Brak płatności</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card">
+                            <small class="text-muted">Dzieci</small>
+                            <h2 id="childrenCount">0</h2>
                         </div>
                     </div>
-                </section>
-
-                <!-- PLACÓWKA -->
-                <section id="placowka" class="content-section">
-                    <div class="my-4">
-                        <h1>🏢 Dane Placówki</h1>
+                    <div class="col-md-3">
+                        <div class="card stat-card">
+                            <small class="text-muted">Opłacone</small>
+                            <h2 id="totalPaid">0 zł</h2>
+                        </div>
                     </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <form id="placowkaForm">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Nazwa Placówki</label>
-                                        <input type="text" class="form-control" id="placowkaNazwa" required>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Adres</label>
-                                        <input type="text" class="form-control" id="placowkaAdres">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Telefon</label>
-                                        <input type="tel" class="form-control" id="placowkaTelefon">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="placowkaEmail">
+                    <div class="col-md-3">
+                        <div class="card stat-card text-danger">
+                            <small class="text-muted">Zaległości</small>
+                            <h2 id="totalDebt">0 zł</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Payments -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="m-0">Ostatnie Płatności</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Rodzic</th>
+                                        <th>Dziecko</th>
+                                        <th>Kwota</th>
+                                        <th>Data</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Brak płatności</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ FACILITY SECTION ============ -->
+            <section id="facility" class="section">
+                <h1 class="mb-4">
+                    <i class="bi bi-building"></i> Dane Placówki
+                </h1>
+                <div class="card">
+                    <div class="card-body">
+                        <form>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="facilityName" class="form-label">Nazwa Placówki</label>
+                                        <input type="text" class="form-control" id="facilityName" placeholder="np. Przedszkole nr 1">
                                     </div>
                                 </div>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-check-circle"></i> Zapisz
-                                </button>
-                            </form>
-                        </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="facilityPhone" class="form-label">Telefon</label>
+                                        <input type="tel" class="form-control" id="facilityPhone" placeholder="np. +48 12 345 67 89">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="facilityAddress" class="form-label">Adres</label>
+                                <input type="text" class="form-control" id="facilityAddress" placeholder="np. ul. Główna 1, 00-000 Miasto">
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check"></i> Zapisz
+                            </button>
+                        </form>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <!-- GRUPY -->
-                <section id="grupy" class="content-section">
-                    <div class="d-flex justify-content-between align-items-center my-4">
-                        <h1>👥 Grupy</h1>
-                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#grupaModal">
-                            <i class="bi bi-plus-circle"></i> Dodaj Grupę
-                        </button>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
+            <!-- ============ GROUPS SECTION ============ -->
+            <section id="groups" class="section">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1>
+                        <i class="bi bi-people"></i> Grupy
+                    </h1>
+                    <button id="addGroupBtn" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Dodaj Grupę
+                    </button>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
@@ -226,52 +243,63 @@
                                         <th>Akcje</th>
                                     </tr>
                                 </thead>
-                                <tbody id="grupiTable">
-                                    <tr><td colspan="3" class="text-center text-muted">Brak grup</td></tr>
+                                <tbody id="groupsTable">
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted">Brak grup</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <!-- RODZICE -->
-                <section id="rodzice" class="content-section">
-                    <div class="d-flex justify-content-between align-items-center my-4">
-                        <h1>👨‍👩‍👧‍👦 Rodzice</h1>
-                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#rodzicModal">
-                            <i class="bi bi-plus-circle"></i> Dodaj Rodzica
-                        </button>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
+            <!-- ============ PARENTS SECTION ============ -->
+            <section id="parents" class="section">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1>
+                        <i class="bi bi-person-hearts"></i> Rodzice
+                    </h1>
+                    <button id="addParentBtn" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Dodaj Rodzica
+                    </button>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
                                         <th>Imię</th>
                                         <th>Nazwisko</th>
-                                        <th>Email</th>
                                         <th>Telefon</th>
                                         <th>Akcje</th>
                                     </tr>
                                 </thead>
-                                <tbody id="rodziceTable">
-                                    <tr><td colspan="5" class="text-center text-muted">Brak rodziców</td></tr>
+                                <tbody id="parentsTable">
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">Brak rodziców</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <!-- DZIECI -->
-                <section id="dzieci" class="content-section">
-                    <div class="d-flex justify-content-between align-items-center my-4">
-                        <h1>👧 Dzieci</h1>
-                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#dzieckoModal">
-                            <i class="bi bi-plus-circle"></i> Dodaj Dziecko
-                        </button>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
+            <!-- ============ CHILDREN SECTION ============ -->
+            <section id="children" class="section">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1>
+                        <i class="bi bi-person-check"></i> Dzieci
+                    </h1>
+                    <button id="addChildBtn" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Dodaj Dziecko
+                    </button>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
@@ -282,24 +310,30 @@
                                         <th>Akcje</th>
                                     </tr>
                                 </thead>
-                                <tbody id="dzieciTable">
-                                    <tr><td colspan="5" class="text-center text-muted">Brak dzieci</td></tr>
+                                <tbody id="childrenTable">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Brak dzieci</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <!-- STAWKI -->
-                <section id="stawki" class="content-section">
-                    <div class="d-flex justify-content-between align-items-center my-4">
-                        <h1>💰 Stawki</h1>
-                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#stawkaModal">
-                            <i class="bi bi-plus-circle"></i> Dodaj Stawkę
-                        </button>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
+            <!-- ============ RATES SECTION ============ -->
+            <section id="rates" class="section">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1>
+                        <i class="bi bi-cash-coin"></i> Stawki
+                    </h1>
+                    <button id="addRateBtn" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Dodaj Stawkę
+                    </button>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
@@ -311,48 +345,42 @@
                                         <th>Akcje</th>
                                     </tr>
                                 </thead>
-                                <tbody id="stawkiTable">
-                                    <tr><td colspan="6" class="text-center text-muted">Brak stawek</td></tr>
+                                <tbody id="ratesTable">
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">Brak stawek</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <!-- OBECNOŚCI -->
-                <section id="obecnosci" class="content-section">
-                    <div class="my-4">
-                        <h1>📅 Obecności</h1>
+            <!-- ============ ATTENDANCE SECTION ============ -->
+            <section id="attendance" class="section">
+                <h1 class="mb-4">
+                    <i class="bi bi-calendar-check"></i> Obecności
+                </h1>
+                <div class="card">
+                    <div class="card-body">
+                        <p class="text-muted">Zaplanowana funkcjonalność do obsługi obecności dzieci</p>
                     </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Wybierz Dziecko</label>
-                                    <select class="form-select" id="dzieckoSelect">
-                                        <option value="">-- Wybierz --</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Miesiąc</label>
-                                    <input type="month" class="form-control" id="obecnosciMiesiac">
-                                </div>
-                            </div>
-                            <div id="obecnosciCalendar"></div>
-                        </div>
-                    </div>
-                </section>
+                </div>
+            </section>
 
-                <!-- PŁATNOŚCI -->
-                <section id="platnosci" class="content-section">
-                    <div class="d-flex justify-content-between align-items-center my-4">
-                        <h1>💳 Płatności</h1>
-                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#platnoscModal">
-                            <i class="bi bi-plus-circle"></i> Dodaj Płatność
-                        </button>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
+            <!-- ============ PAYMENTS SECTION ============ -->
+            <section id="payments" class="section">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1>
+                        <i class="bi bi-credit-card"></i> Płatności
+                    </h1>
+                    <button id="addPaymentBtn" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Dodaj Płatność
+                    </button>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
@@ -364,462 +392,174 @@
                                         <th>Akcje</th>
                                     </tr>
                                 </thead>
-                                <tbody id="platnosciTable">
-                                    <tr><td colspan="6" class="text-center text-muted">Brak płatności</td></tr>
+                                <tbody id="paymentsTable">
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">Brak płatności</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <!-- RAPORTY -->
-                <section id="raporty" class="content-section">
-                    <div class="my-4">
-                        <h1>📊 Raporty</h1>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Raport Zaległości</h5>
-                                    <p class="card-text">Szczegółowy raport wszystkich zaległości</p>
-                                    <button class="btn btn-primary btn-sm" onclick="generateReport('zaleglosci')">
-                                        <i class="bi bi-download"></i> Pobierz PDF
-                                    </button>
-                                    <button class="btn btn-success btn-sm" onclick="generateReport('zaleglosci', 'excel')">
-                                        <i class="bi bi-download"></i> Pobierz Excel
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Raport Płatności</h5>
-                                    <p class="card-text">Podsumowanie wszystkich wpłat</p>
-                                    <button class="btn btn-primary btn-sm" onclick="generateReport('platnosci')">
-                                        <i class="bi bi-download"></i> Pobierz PDF
-                                    </button>
-                                    <button class="btn btn-success btn-sm" onclick="generateReport('platnosci', 'excel')">
-                                        <i class="bi bi-download"></i> Pobierz Excel
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mt-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Rachunek</h5>
-                                    <p class="card-text">Wygeneruj rachunek dla rodzica</p>
-                                    <select class="form-select form-select-sm mb-2" id="rodzicForInvoice">
-                                        <option value="">-- Wybierz rodzica --</option>
-                                    </select>
-                                    <button class="btn btn-primary btn-sm" onclick="generateInvoice()">
-                                        <i class="bi bi-receipt"></i> Rachunek
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mt-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Statystyki</h5>
-                                    <p class="card-text">Podsumowanie statystyczne</p>
-                                    <button class="btn btn-primary btn-sm" onclick="generateReport('statystyki')">
-                                        <i class="bi bi-download"></i> Pobierz PDF
-                                    </button>
-                                    <button class="btn btn-success btn-sm" onclick="generateReport('statystyki', 'excel')">
-                                        <i class="bi bi-download"></i> Pobierz Excel
-                                    </button>
-                                </div>
+            <!-- ============ REPORTS SECTION ============ -->
+            <section id="reports" class="section">
+                <h1 class="mb-4">
+                    <i class="bi bi-bar-chart"></i> Raporty
+                </h1>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="bi bi-exclamation-triangle"></i> Raport Zaległości
+                                </h5>
+                                <p class="card-text">Szczegółowy raport wszystkich zaległości</p>
+                                <button class="btn btn-primary btn-sm">Wygeneruj</button>
                             </div>
                         </div>
                     </div>
-                </section>
-
-                <!-- IMPORT -->
-                <section id="import" class="content-section">
-                    <div class="my-4">
-                        <h1>📤 Import Danych</h1>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <h5>Import z Pliku Bankowego (CSV/XLSX)</h5>
-                            <p class="text-muted">Importuj dane przelewów z wyrębem bankowym</p>
-                            <input type="file" class="form-control mb-3" id="importFile" accept=".csv,.xlsx,.xls">
-                            <button class="btn btn-primary" onclick="importBankData()">
-                                <i class="bi bi-upload"></i> Importuj
-                            </button>
-                            <div id="importResult" class="mt-3"></div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- BACKUP -->
-                <section id="backup" class="content-section">
-                    <div class="my-4">
-                        <h1>💾 Backup i Restore</h1>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Utwórz Backup</h5>
-                                    <p class="card-text">Stwórz kopię bezpieczeństwa bazy danych</p>
-                                    <button class="btn btn-success" onclick="createBackup()">
-                                        <i class="bi bi-cloud-arrow-up"></i> Backup Teraz
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Przywróć Backup</h5>
-                                    <p class="card-text">Przywróć dane z wcześniejszego backupu</p>
-                                    <button class="btn btn-warning" onclick="restoreBackup()">
-                                        <i class="bi bi-cloud-arrow-down"></i> Przywróć
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-12 mt-3">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5>Historia Backupów</h5>
-                                </div>
-                                <div class="card-body">
-                                    <table class="table table-sm">
-                                        <thead>
-                                            <tr>
-                                                <th>Nazwa</th>
-                                                <th>Rozmiar</th>
-                                                <th>Data</th>
-                                                <th>Akcje</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="backupTable">
-                                            <tr><td colspan="4" class="text-center text-muted">Brak backupów</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="bi bi-check-circle"></i> Raport Płatności
+                                </h5>
+                                <p class="card-text">Podsumowanie wszystkich wpłat</p>
+                                <button class="btn btn-primary btn-sm">Wygeneruj</button>
                             </div>
                         </div>
                     </div>
-                </section>
-            </main>
-        </div>
-    </div>
-
-    <!-- MODALS -->
-
-    <!-- Grupa Modal -->
-    <div class="modal fade" id="grupaModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Nowa Grupa</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <form id="grupaForm">
-                        <div class="mb-3">
-                            <label class="form-label">Nazwa Grupy</label>
-                            <input type="text" class="form-control" id="grupaNazwa" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Opis</label>
-                            <textarea class="form-control" id="grupaOpis"></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
-                    <button type="button" class="btn btn-primary" onclick="saveGrupa()">Zapisz</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Rodzic Modal -->
-    <div class="modal fade" id="rodzicModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Nowy Rodzic</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="rodzicForm">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Imię</label>
-                                <input type="text" class="form-control" id="rodzicImie" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Nazwisko</label>
-                                <input type="text" class="form-control" id="rodzicNazwisko" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" id="rodzicEmail">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Telefon</label>
-                                <input type="tel" class="form-control" id="rodzicTelefon">
-                            </div>
-                            </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
-                    <button type="button" class="btn btn-primary" onclick="saveRodzic()">Zapisz</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Dziecko Modal -->
-    <div class="modal fade" id="dzieckoModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Nowe Dziecko</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="dzieckoForm">
-                        <div class="mb-3">
-                            <label class="form-label">Rodzic</label>
-                            <select class="form-select" id="dzieckoRodzic" required>
-                                <option value="">-- Wybierz --</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Grupa</label>
-                            <select class="form-select" id="dzieckoGrupa" required>
-                                <option value="">-- Wybierz --</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Imię</label>
-                            <input type="text" class="form-control" id="dzieckoImie" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Nazwisko</label>
-                            <input type="text" class="form-control" id="dzieckoNazwisko" required>
-                        </div
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
-                    <button type="button" class="btn btn-primary" onclick="saveDziecko()">Zapisz</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Stawka Modal -->
-    <div class="modal fade" id="stawkaModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Nowa Stawka</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="stawkaForm">
-                        <div class="mb-3">
-                            <label class="form-label">Grupa</label>
-                            <select class="form-select" id="stawkaGrupa" required>
-                                <option value="">-- Wybierz --</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Kategoria</label>
-                            <select class="form-select" id="stawkaKategoria" required>
-                                <option value="">-- Wybierz --</option>
-                                <option value="sniardanie">Śniadanie</option>
-                                <option value="drugie_sniadanie">II Śniadanie</option>
-                                <option value="obiad">Obiad</option>
-                                <option value="podwieczorek">Podwieczorek</option>
-                                <option value="calkosc">Pełna opłata</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Kwota (zł)</label>
-                            <input type="number" class="form-control" id="stawkaKwota" step="0.01" required>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Od</label>
-                                <input type="date" class="form-control" id="stawkaDataOd">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Do</label>
-                                <input type="date" class="form-control" id="stawkaDataDo">
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="bi bi-receipt"></i> Rachunek
+                                </h5>
+                                <p class="card-text">Wygeneruj rachunek dla rodzica</p>
+                                <button class="btn btn-primary btn-sm">Wygeneruj</button>
                             </div>
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
-                    <button type="button" class="btn btn-primary" onclick="saveStawka()">Zapisz</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Platność Modal -->
-    <div class="modal fade" id="platnoscModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Nowa Płatność</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="platnoscForm">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Rodzic</label>
-                                <select class="form-select" id="platnoscRodzic" required>
-                                    <option value="">-- Wybierz --</option>
-                                </select>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="bi bi-graph-up"></i> Statystyki
+                                </h5>
+                                <p class="card-text">Podsumowanie statystyczne</p>
+                                <button class="btn btn-primary btn-sm">Wygeneruj</button>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Dziecko</label>
-                                <select class="form-select" id="platnoscDziecko">
-                                    <option value="">-- Wybierz --</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Kwota (zł)</label>
-                                <input type="number" class="form-control" id="platnoscKwota" step="0.01" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Data Płatności</label>
-                                <input type="date" class="form-control" id="platnoscData" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Kategoria</label>
-                                <select class="form-select" id="platnoscKategoria">
-                                    <option value="calkosc">Pełna opłata</option>
-                                    <option value="sniardanie">Śniadanie</option>
-                                    <option value="drugie_sniadanie">II Śniadanie</option>
-                                    <option value="obiad">Obiad</option>
-                                    <option value="podwieczorek">Podwieczorek</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Status</label>
-                                <select class="form-select" id="platnoscStatus">
-                                    <option value="opłacona">Opłacona</option>
-                                    <option value="oczekująca">Oczekująca</option>
-                                    <option value="zaległa">Zaległa</option>
-                                </select>
-                            </div>
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">Opis</label>
-                                <textarea class="form-control" id="platnoscOpis"></textarea>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
-                    <button type="button" class="btn btn-primary" onclick="savePlatnosc()">Zapisz</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Settings Modal -->
-    <div class="modal fade" id="settingsModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">⚙️ Ustawienia</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="tab" href="#emailSettings">Email</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#backupSettings">Backup</a>
-                        </li>
-                    </ul>
-
-                    <div class="tab-content mt-3">
-                        <!-- Email Settings -->
-                        <div id="emailSettings" class="tab-pane fade show active">
-                            <form id="emailForm">
-                                <div class="mb-3">
-                                    <label class="form-label">SMTP Host</label>
-                                    <input type="text" class="form-control" id="smtpHost" placeholder="smtp.gmail.com">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">SMTP Port</label>
-                                    <input type="number" class="form-control" id="smtpPort" placeholder="587">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">SMTP User</label>
-                                    <input type="email" class="form-control" id="smtpUser" placeholder="twoj@gmail.com">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">SMTP Password</label>
-                                    <input type="password" class="form-control" id="smtpPassword">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Email Od</label>
-                                    <input type="email" class="form-control" id="emailOd">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Imię Nadawcy</label>
-                                    <input type="text" class="form-control" id="emailImie">
-                                </div>
-                                <button type="button" class="btn btn-warning btn-sm" onclick="testEmail()">
-                                    <i class="bi bi-send"></i> Testuj Połączenie
-                                </button>
-                                <button type="button" class="btn btn-primary btn-sm" onclick="saveEmailSettings()">
-                                    <i class="bi bi-check-circle"></i> Zapisz
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- Backup Settings -->
-                        <div id="backupSettings" class="tab-pane fade">
-                            <p>Użyj zakładki <strong>Backup</strong> w głównym menu do zarządzania kopiami bezpieczeństwa.</p>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
+            </section>
 
-    <!-- About Modal -->
-    <div class="modal fade" id="aboutModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">ℹ️ O Aplikacji</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <h5>Kwitariusz Szkoły v1.5.0</h5>
-                    <p class="text-muted">System zarządzania opłatami szkolnymi</p>
-                    <hr>
-                    <p><strong>Autor:</strong> IGO-NET</p>
+            <!-- ============ IMPORT SECTION ============ -->
+            <section id="import" class="section">
+                <h1 class="mb-4">
+                    <i class="bi bi-cloud-arrow-up"></i> Import Danych
+                </h1>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-file-earmark-spreadsheet"></i> Import z Pliku Bankowego (CSV/XLSX)
+                        </h5>
+                        <p class="card-text">Importuj dane przelewów z wyrębem bankowym</p>
+                        <input type="file" class="form-control mb-2" accept=".csv,.xlsx">
+                        <button class="btn btn-primary">Importuj</button>
                     </div>
-            </div>
-        </div>
+                </div>
+            </section>
+
+            <!-- ============ BACKUP SECTION ============ -->
+            <section id="backup" class="section">
+                <h1 class="mb-4">
+                    <i class="bi bi-cloud-check"></i> Backup i Restore
+                </h1>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="bi bi-cloud-arrow-down"></i> Utwórz Backup
+                                </h5>
+                                <p class="card-text">Stwórz kopię bezpieczeństwa bazy danych</p>
+                                <button class="btn btn-success">Utwórz Backup</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="bi bi-cloud-arrow-up"></i> Przywróć Backup
+                                </h5>
+                                <p class="card-text">Przywróć dane z wcześniejszego backupu</p>
+                                <input type="file" class="form-control mb-2" accept=".backup">
+                                <button class="btn btn-warning">Przywróć</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="m-0">Historia Backupów</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Nazwa</th>
+                                        <th>Rozmiar</th>
+                                        <th>Data</th>
+                                        <th>Akcje</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">Brak backupów</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
 
-    <!-- SCRIPTS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="public/js/theme.js"></script>
-    <script src="public/js/ui.js"></script>
+    <!-- ============ SCRIPTS ============ -->
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Theme System (MUST BE FIRST!) -->
+    <script src="theme.js"></script>
+
+    <!-- UI System (AFTER theme.js) -->
+    <script src="ui.js"></script>
+
+    <!-- Database System -->
+    <script src="database.js"></script>
+
+    <!-- API Bridge (dla Electron) -->
+    <script>
+        // Fallback jeśli window.api nie istnieje
+        if (typeof window.api === 'undefined') {
+            window.api = {
+                getStatystyki: async () => ({ liczba_dzieci: 0, liczba_rodzicow: 0, razem_oplacone: 0, razem_zaleglosci: 0 }),
+                getDzieci: async () => [],
+                getRodzice: async () => [],
+                getGrupy: async () => [],
+                getPlatnosci: async () => [],
+                getStawki: async () => []
+            };
+        }
+    </script>
 </body>
 </html>
