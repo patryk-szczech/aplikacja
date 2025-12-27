@@ -1,4 +1,3 @@
-// Usuń WSZYSTKO i wklej:
 document.addEventListener('DOMContentLoaded', function() {
     const htmlElement = document.documentElement;
     const bodyElement = document.body;
@@ -8,5 +7,5 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.style.backgroundColor = '#1f2121';
     document.body.style.color = '#f5f5f5';
     localStorage.setItem('theme', 'dark');
-    console.log('✅ CIEMNY MOTYW');
+    console.log('✅ DARK MODE');
 });
