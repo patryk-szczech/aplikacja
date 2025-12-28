@@ -1362,4 +1362,46 @@ a.dropdown-toggle {
 
 a.dropdown-toggle:hover {
     color: var(--color-teal-300);
+
+/* ============== SECTION VISIBILITY ==============*/
+.section {
+  display: none !important;
+  animation: fadeIn var(--duration-normal) ease-in-out;
 }
+
+.section.active {
+  display: block !important;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============== BADGES ==============*/
+.badge {
+  display: inline-block;
+  padding: var(--space-4) var(--space-8);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.badge-success {
+  background-color: rgba(var(--color-success-rgb, 33, 128, 141), 0.2);
+  color: var(--color-success);
+  border: 1px solid rgba(var(--color-success-rgb, 33, 128, 141), 0.3);
+}
+
+.badge-warning {
+  background-color: rgba(var(--color-warning-rgb, 168, 75, 47), 0.2);
+  color: var(--color-warning);
+  border: 1px solid rgba(var(--color-warning-rgb, 168, 75, 47), 0.3);
+}
+
